@@ -28,7 +28,6 @@
         .info-box:hover {
             border-color: #86efac;
         }
-        /* Hiệu ứng khi bật chế độ Quản trị */
         .admin-mode [contenteditable="true"] {
             outline: 1.5px dashed #10b981;
             background-color: #ecfdf5;
@@ -44,16 +43,21 @@
         .admin-mode .admin-only { display: inline-flex !important; }
         .admin-block { display: none !important; }
         .admin-mode .admin-block { display: block !important; }
+        .logo-option.selected {
+            border-color: #059669;
+            background-color: #d1fae5;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased pb-20">
 
-    <!-- THANH CÔNG CỤ QUẢN TRỊ (CHỈ HIỆN KHI MỞ KHÓA) -->
-    <div class="admin-block sticky top-0 z-50 bg-emerald-900/95 text-white backdrop-blur-md border-b border-emerald-700 px-4 py-3 shadow-lg">
+    <!-- THANH CÔNG CỤ QUẢN TRỊ -->
+    <div class="admin-block sticky top-0 z-40 bg-emerald-900/95 text-white backdrop-blur-md border-b border-emerald-700 px-4 py-3 shadow-lg">
         <div class="max-w-2xl mx-auto flex flex-col gap-2">
             <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
                 <span class="font-semibold text-emerald-200 flex items-center gap-1.5">
-                    <i class="fa-solid fa-pen-to-square"></i> Chế độ Quản trị: Bấm trực tiếp vào chữ để sửa
+                    <i class="fa-solid fa-pen-to-square"></i> Chế độ Quản trị: Bấm vào chữ để sửa trực tiếp
                 </span>
                 <div class="flex flex-wrap items-center gap-1.5">
                     <button onclick="copyUpdatedHTML()" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-semibold transition shadow-sm">
@@ -71,18 +75,17 @@
                 </div>
             </div>
             <p class="text-[11px] text-emerald-200/90">
-                💡 <b>Mẹo đồng bộ mọi thiết bị:</b> Sau khi sửa hoặc thêm ảnh xong, hãy bấm <b>"Copy Code HTML đã sửa"</b> rồi dán vào file <code>index.html</code> trên GitHub (hoặc bấm <b>"Lưu thẳng lên GitHub"</b>) để mọi điện thoại/máy tính khác đều thấy ngay.
+                💡 Sau khi chỉnh sửa xong, bấm <b>"Copy Code HTML đã sửa"</b> rồi dán vào file <code>index.html</code> trên GitHub để cập nhật cho mọi thiết bị.
             </p>
         </div>
     </div>
 
-    <!-- KHUNG NỘI DUNG CHÍNH -->
+    <!-- NỘI DUNG CHÍNH -->
     <main class="max-w-2xl mx-auto px-4 pt-6 sm:pt-10 space-y-6">
 
-        <!-- 1. THẺ GIỚI THIỆU & THÔNG TIN CÁ NHÂN -->
+        <!-- 1. GIỚI THIỆU & THÔNG TIN CÁ NHÂN -->
         <section class="card-green p-6 sm:p-8">
             <div class="flex flex-col items-center text-center">
-                <!-- Ảnh đại diện -->
                 <div class="relative group mb-4">
                     <img id="avatar-img" src="" alt="Nguyễn Đức Khải" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-emerald-100 shadow-md bg-emerald-50">
                     <label class="admin-only absolute inset-0 rounded-full bg-black/55 text-white text-xs font-medium items-center justify-center cursor-pointer">
@@ -91,13 +94,11 @@
                     </label>
                 </div>
 
-                <!-- Nhãn Hồ sơ cá nhân (Đã bỏ nhãn Đồng bộ đám mây) -->
                 <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold mb-3">
                     <i class="fa-solid fa-seedling text-emerald-600"></i>
                     <span>Hồ sơ cá nhân</span>
                 </div>
 
-                <!-- Họ tên & Chức danh -->
                 <h1 id="profile-name" class="text-2xl sm:text-3xl font-extrabold text-emerald-950 tracking-tight" onblur="saveField('name', this.innerText)"></h1>
                 <p id="profile-role" class="text-emerald-700 font-semibold text-sm sm:text-base mt-1.5" onblur="saveField('role', this.innerText)"></p>
                 <p id="profile-bio" class="text-slate-600 text-sm sm:text-[15px] leading-relaxed mt-3 max-w-xl" onblur="saveField('bio', this.innerText)"></p>
@@ -112,7 +113,7 @@
                         <i class="fa-regular fa-id-card text-emerald-600"></i>
                         <span>Thông tin cá nhân</span>
                     </h2>
-                    <button onclick="addPersonalInfo()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg">
+                    <button onclick="openInfoModal(-1)" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl transition">
                         <i class="fa-solid fa-plus"></i> Thêm mục
                     </button>
                 </div>
@@ -130,24 +131,22 @@
                     </div>
                     <h2 class="text-lg sm:text-xl font-extrabold text-emerald-950">Học Vấn & Quá Trình Phát Triển</h2>
                 </div>
-                <button onclick="addTimeline()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1.5 rounded-lg shrink-0">
+                <button onclick="addTimeline()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl shrink-0">
                     <i class="fa-solid fa-plus"></i> Thêm mốc
                 </button>
             </div>
 
-            <!-- Danh sách mốc thời gian -->
             <div id="timeline-list" class="space-y-6 pl-2"></div>
 
             <hr class="border-emerald-100 my-7">
 
-            <!-- Kỹ năng & Công cụ yêu thích -->
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-2">
                         <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i>
                         <span>Kỹ năng & Công cụ yêu thích</span>
                     </h3>
-                    <button onclick="addSkill()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg">
+                    <button onclick="addSkill()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl">
                         <i class="fa-solid fa-plus"></i> Thêm kỹ năng
                     </button>
                 </div>
@@ -164,7 +163,7 @@
                     </div>
                     <h2 class="text-lg sm:text-xl font-extrabold text-emerald-950">Dự Án Đã Thực Hiện</h2>
                 </div>
-                <button onclick="addProject()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1.5 rounded-lg shrink-0">
+                <button onclick="openProjectModal(-1)" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl shrink-0">
                     <i class="fa-solid fa-plus"></i> Thêm dự án
                 </button>
             </div>
@@ -172,7 +171,7 @@
             <div id="projects-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
         </section>
 
-        <!-- 4. KẾT NỐI & LIÊN HỆ -->
+        <!-- 4. KẾT NỐI & LIÊN HỆ (ĐÃ NÂNG CẤP CHỌN LOGO & SỬA LỖI) -->
         <section class="card-green p-6 sm:p-8">
             <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-3">
@@ -181,14 +180,14 @@
                     </div>
                     <h2 class="text-lg sm:text-xl font-extrabold text-emerald-950">Kết Nối & Liên Hệ</h2>
                 </div>
-                <button onclick="addContactLink()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1.5 rounded-lg shrink-0">
+                <button type="button" onclick="openLinkModal(-1)" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3.5 py-2 rounded-xl shrink-0 transition cursor-pointer">
                     <i class="fa-solid fa-plus"></i> Thêm liên kết
                 </button>
             </div>
             <div id="links-list" class="flex flex-wrap gap-3"></div>
         </section>
 
-        <!-- 5. GÓC ẢNH CÁ NHÂN (Ở CUỐI TRANG) -->
+        <!-- 5. GÓC ẢNH CÁ NHÂN -->
         <section class="card-green p-6 sm:p-8">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-3">
@@ -218,7 +217,107 @@
         </button>
     </footer>
 
-    <!-- HỘP THOẠI NHẬP MẬT KHẨU QUẢN TRỊ -->
+    <!-- MODAL 1: THÊM / SỬA LIÊN KẾT & CHỌN LOGO -->
+    <div id="link-modal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between">
+                <h3 id="link-modal-title" class="font-extrabold text-emerald-950 text-base sm:text-lg">Thêm Liên Kết Mới</h3>
+                <button type="button" onclick="closeLinkModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Bảng chọn Logo -->
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-emerald-800">1. Chọn Logo / Biểu tượng</label>
+                    <label class="text-xs font-semibold text-emerald-700 hover:text-emerald-600 cursor-pointer flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                        <i class="fa-solid fa-upload text-[11px]"></i> Tải ảnh logo riêng
+                        <input type="file" accept="image/*" class="hidden" onchange="uploadCustomLinkLogo(event)">
+                    </label>
+                </div>
+                <div id="logo-picker-grid" class="grid grid-cols-4 sm:grid-cols-5 gap-2"></div>
+            </div>
+
+            <!-- Tên hiển thị -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5">2. Tên hiển thị trên nút</label>
+                <input id="link-label-input" type="text" placeholder="VD: Facebook Cá Nhân, Zalo, TikTok..." class="w-full px-3.5 py-2.5 rounded-xl border border-emerald-200 focus:outline-none focus:border-emerald-500 text-sm font-medium">
+            </div>
+
+            <!-- Đường dẫn -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5">3. Đường dẫn (Link / SĐT / Email)</label>
+                <input id="link-url-input" type="text" placeholder="VD: https://facebook.com/... hoặc SĐT Zalo" class="w-full px-3.5 py-2.5 rounded-xl border border-emerald-200 focus:outline-none focus:border-emerald-500 text-sm">
+                <p class="text-[11px] text-slate-400 mt-1">Tự động nhận diện link web, số điện thoại Zalo hoặc địa chỉ Email.</p>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeLinkModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Hủy</button>
+                <button type="button" onclick="saveLinkModal()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm">
+                    <i class="fa-solid fa-check mr-1"></i>Lưu liên kết
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: THÊM / SỬA MỤC THÔNG TIN CÁ NHÂN & CHỌN ICON -->
+    <div id="info-modal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 id="info-modal-title" class="font-extrabold text-emerald-950 text-base">Thông Tin Cá Nhân</h3>
+                <button type="button" onclick="closeInfoModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">Chọn Biểu tượng</label>
+                <div id="info-icon-grid" class="grid grid-cols-6 gap-2"></div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">Tiêu đề mục (VD: NGÀY SINH, QUÊ QUÁN)</label>
+                <input id="info-label-input" type="text" placeholder="VD: SỞ THÍCH" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:border-emerald-500 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">Nội dung</label>
+                <input id="info-value-input" type="text" placeholder="VD: Thích Code và yêu thích bản mạch" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:border-emerald-500 text-sm">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeInfoModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Hủy</button>
+                <button type="button" onclick="saveInfoModal()" class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: THÊM / SỬA DỰ ÁN -->
+    <div id="project-modal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 id="project-modal-title" class="font-extrabold text-emerald-950 text-base">Dự Án</h3>
+                <button type="button" onclick="closeProjectModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">Tên dự án</label>
+                <input id="project-title-input" type="text" placeholder="VD: Hệ thống tự động hóa Python" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:border-emerald-500 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">Mô tả ngắn</label>
+                <textarea id="project-desc-input" rows="3" placeholder="Mô tả ngắn gọn về dự án..." class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:border-emerald-500 text-sm"></textarea>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">Đường dẫn (URL)</label>
+                <input id="project-url-input" type="text" placeholder="https://github.com/..." class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:border-emerald-500 text-sm">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeProjectModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Hủy</button>
+                <button type="button" onclick="saveProjectModal()" class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white">Lưu dự án</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NHẬP MẬT KHẨU QUẢN TRỊ -->
     <div id="pin-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-emerald-100 space-y-4">
             <div class="flex items-center justify-between">
@@ -239,9 +338,9 @@
         <img id="lightbox-img" src="" class="max-h-[90vh] max-w-[92vw] rounded-2xl object-contain">
     </div>
 
-    <!-- DỮ LIỆU GỐC ĐÃ CẬP NHẬT THEO ĐÚNG ẢNH CỦA BẠN -->
+    <!-- DỮ LIỆU GỐC -->
     <script id="initial-data">
-        window.DATA_VERSION = "20261020_v3";
+        window.DATA_VERSION = "20261020_v4";
         window.DEFAULT_DATA = {
             pin: "1234",
             avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
@@ -292,18 +391,53 @@
             ],
             projects: [],
             links: [
-                { label: "Facebook Cá Nhân", url: "https://facebook.com", icon: "fa-brands fa-facebook" },
-                { label: "GitHub Dự Án", url: "https://github.com", icon: "fa-brands fa-github" }
+                { label: "Facebook Cá Nhân", url: "https://facebook.com", icon: "fa-brands fa-facebook", customLogo: "" },
+                { label: "GitHub Dự Án", url: "https://github.com", icon: "fa-brands fa-github", customLogo: "" }
             ],
             photos: []
         };
     </script>
 
-    <!-- BỘ XỬ LÝ GIAO DIỆN & ĐỒNG BỘ -->
+    <!-- LOGIC XỬ LÝ -->
     <script>
         const STORAGE_KEY = "duckhai_portfolio_" + window.DATA_VERSION;
         let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || JSON.parse(JSON.stringify(window.DEFAULT_DATA));
         let isAdmin = false;
+
+        // Danh sách Logo phổ biến cho mục Kết Nối & Liên Hệ
+        const LOGO_PRESETS = [
+            { name: "Facebook", icon: "fa-brands fa-facebook" },
+            { name: "Zalo", icon: "zalo-svg" },
+            { name: "TikTok", icon: "fa-brands fa-tiktok" },
+            { name: "GitHub", icon: "fa-brands fa-github" },
+            { name: "Instagram", icon: "fa-brands fa-instagram" },
+            { name: "YouTube", icon: "fa-brands fa-youtube" },
+            { name: "Telegram", icon: "fa-brands fa-telegram" },
+            { name: "Messenger", icon: "fa-brands fa-facebook-messenger" },
+            { name: "Discord", icon: "fa-brands fa-discord" },
+            { name: "Threads", icon: "fa-brands fa-threads" },
+            { name: "LinkedIn", icon: "fa-brands fa-linkedin" },
+            { name: "Email", icon: "fa-solid fa-envelope" },
+            { name: "Điện thoại", icon: "fa-solid fa-phone" },
+            { name: "Website", icon: "fa-solid fa-globe" },
+            { name: "Link khác", icon: "fa-solid fa-link" }
+        ];
+
+        // Danh sách Icon cho mục Thông tin cá nhân
+        const INFO_ICONS = [
+            "fa-solid fa-cake-candles",
+            "fa-solid fa-location-dot",
+            "fa-solid fa-building-columns",
+            "fa-solid fa-microchip",
+            "fa-solid fa-globe",
+            "fa-solid fa-heart",
+            "fa-solid fa-envelope",
+            "fa-solid fa-phone",
+            "fa-solid fa-user-graduate",
+            "fa-solid fa-briefcase",
+            "fa-solid fa-code",
+            "fa-solid fa-star"
+        ];
 
         document.getElementById("year").innerText = new Date().getFullYear();
 
@@ -311,10 +445,41 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
+        // Hiển thị biểu tượng hoặc ảnh logo (hỗ trợ cả icon Zalo riêng và ảnh tự tải lên)
+        function renderLinkLogoHTML(linkObj, sizeClass = "text-base") {
+            if (linkObj.customLogo) {
+                return `<img src="${linkObj.customLogo}" alt="" class="w-5 h-5 rounded-full object-cover shrink-0">`;
+            }
+            if (linkObj.icon === "zalo-svg") {
+                return `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-600 text-white font-extrabold text-[10px] shrink-0">Z</span>`;
+            }
+            return `<i class="${linkObj.icon \vert{}\vert{} 'fa-solid fa-link'} text-emerald-600${sizeClass}"></i>`;
+        }
+
+        // Tự động chuẩn hóa URL để không bao giờ bị lỗi khi bấm
+        function normalizeUrl(rawUrl, iconType) {
+            let u = (rawUrl || "").trim();
+            if (!u) return "#";
+            if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("mailto:") || u.startsWith("tel:")) {
+                return u;
+            }
+            // Nếu là Email
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u)) {
+                return "mailto:" + u;
+            }
+            // Nếu là số điện thoại
+            if (/^[0-9+\-\s]{8,15}$/.test(u)) {
+                const cleanPhone = u.replace(/\s+/g, "");
+                if (iconType === "zalo-svg") return "https://zalo.me/" + cleanPhone;
+                return "tel:" + cleanPhone;
+            }
+            return "https://" + u;
+        }
+
         function render() {
             document.body.classList.toggle("admin-mode", isAdmin);
 
-            // 1. Render Header
+            // 1. Header
             document.getElementById("avatar-img").src = state.avatar;
             const nameEl = document.getElementById("profile-name");
             const roleEl = document.getElementById("profile-role");
@@ -326,50 +491,55 @@
 
             [nameEl, roleEl, bioEl].forEach(el => el.contentEditable = isAdmin ? "true" : "false");
 
-            // 2. Render Thông tin cá nhân
+            // 2. Thông tin cá nhân
             const infoGrid = document.getElementById("info-grid");
             infoGrid.innerHTML = state.personalInfo.map((item, idx) => `
                 <div class="info-box p-4 flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3.5 min-w-0">
-                        <div class="w-11 h-11 rounded-2xl bg-white border border-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
+                        <button type="button" onclick="${isAdmin ? `openInfoModal(${idx})` : ''}" class="w-11 h-11 rounded-2xl bg-white border border-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs ${isAdmin ? 'cursor-pointer hover:bg-emerald-50 ring-1 ring-emerald-300' : 'cursor-default'}" title="${isAdmin ? 'Bấm để đổi biểu tượng' : ''}">
                             <i class="${item.icon || 'fa-solid fa-circle-info'} text-base"></i>
-                        </div>
+                        </button>
                         <div class="min-w-0">
                             <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-700/80" contenteditable="${isAdmin}" onblur="updatePersonalInfo(${idx}, 'label', this.innerText)">${item.label}</p>
                             <p class="text-sm sm:text-[15px] font-bold text-emerald-950 truncate" contenteditable="${isAdmin}" onblur="updatePersonalInfo(${idx}, 'value', this.innerText)">${item.value}</p>
                         </div>
                     </div>
-                    <button onclick="removePersonalInfo(${idx})" class="admin-only text-rose-500 hover:text-rose-600 text-xs p-1 shrink-0" title="Xóa mục này">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <div class="admin-only items-center gap-1 shrink-0">
+                        <button type="button" onclick="openInfoModal(${idx})" class="text-emerald-700 hover:text-emerald-900 text-xs p-1.5" title="Sửa mục này">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button type="button" onclick="removePersonalInfo(${idx})" class="text-rose-500 hover:text-rose-600 text-xs p-1.5" title="Xóa mục này">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
             `).join("");
 
-            // 3. Render Học vấn & Quá trình phát triển
+            // 3. Học vấn & Quá trình phát triển
             const timelineList = document.getElementById("timeline-list");
             timelineList.innerHTML = state.timeline.map((item, idx) => `
                 <div class="relative pl-6 border-l-2 border-emerald-300 space-y-1.5">
                     <span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow"></span>
                     <div class="flex items-center justify-between gap-2">
                         <span class="inline-block px-3 py-0.5 rounded-full bg-emerald-100/90 text-emerald-800 text-xs font-bold" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'time', this.innerText)">${item.time}</span>
-                        <button onclick="removeTimeline(${idx})" class="admin-only text-rose-500 hover:text-rose-600 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        <button type="button" onclick="removeTimeline(${idx})" class="admin-only text-rose-500 hover:text-rose-600 text-xs"><i class="fa-solid fa-trash"></i></button>
                     </div>
                     <h3 class="text-base font-extrabold text-emerald-950 pt-0.5" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'title', this.innerText)">${item.title}</h3>
                     <p class="text-slate-600 text-sm leading-relaxed" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'desc', this.innerText)">${item.desc}</p>
                 </div>
             `).join("");
 
-            // 4. Render Kỹ năng
+            // 4. Kỹ năng
             const skillsList = document.getElementById("skills-list");
             skillsList.innerHTML = state.skills.map((skill, idx) => `
                 <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50/90 border border-emerald-200 text-emerald-900 text-xs sm:text-sm font-semibold">
                     <i class="fa-solid fa-check text-emerald-600 text-xs"></i>
                     <span contenteditable="${isAdmin}" onblur="updateSkill(${idx}, this.innerText)">${skill}</span>
-                    <button onclick="removeSkill(${idx})" class="admin-only text-rose-500 hover:text-rose-600 ml-1"><i class="fa-solid fa-xmark"></i></button>
+                    <button type="button" onclick="removeSkill(${idx})" class="admin-only text-rose-500 hover:text-rose-600 ml-1"><i class="fa-solid fa-xmark"></i></button>
                 </span>
             `).join("");
 
-            // 5. Render Dự án
+            // 5. Dự án
             const projectsList = document.getElementById("projects-list");
             if (state.projects.length === 0) {
                 projectsList.innerHTML = isAdmin
@@ -382,13 +552,13 @@
                             <div class="flex items-start justify-between gap-2">
                                 <h3 class="font-bold text-emerald-950 text-sm sm:text-base" contenteditable="${isAdmin}" onblur="updateProject(${idx}, 'title', this.innerText)">${proj.title}</h3>
                                 <div class="flex items-center gap-2 shrink-0">
-                                    <button onclick="editProjectUrl(${idx})" class="admin-only text-xs text-emerald-700" title="Sửa link"><i class="fa-solid fa-link"></i></button>
-                                    <button onclick="removeProject(${idx})" class="admin-only text-xs text-rose-500" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                                    <button type="button" onclick="openProjectModal(${idx})" class="admin-only text-xs text-emerald-700 hover:text-emerald-900" title="Sửa dự án"><i class="fa-solid fa-pen"></i></button>
+                                    <button type="button" onclick="removeProject(${idx})" class="admin-only text-xs text-rose-500 hover:text-rose-600" title="Xóa"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                             <p class="text-slate-600 text-xs leading-relaxed" contenteditable="${isAdmin}" onblur="updateProject(${idx}, 'desc', this.innerText)">${proj.desc}</p>
                         </div>
-                        <a href="${proj.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-600 w-fit">
+                        <a href="${normalizeUrl(proj.url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-600 w-fit">
                             <span>Xem chi tiết</span>
                             <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                         </a>
@@ -396,20 +566,27 @@
                 `).join("");
             }
 
-            // 6. Render Liên hệ
+            // 6. Kết Nối & Liên Hệ
             const linksList = document.getElementById("links-list");
-            linksList.innerHTML = state.links.map((lk, idx) => `
+            linksList.innerHTML = state.links.map((lk, idx) => {
+                const safeHref = normalizeUrl(lk.url, lk.icon);
+                return `
                 <div class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200 transition">
-                    <a href="${lk.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-950">
-                        <i class="${lk.icon || 'fa-solid fa-link'} text-emerald-600 text-base"></i>
+                    <a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 text-xs sm:text-sm font-bold text-emerald-950">
+                        ${renderLinkLogoHTML(lk)}
                         <span>${lk.label}</span>
                     </a>
-                    <button onclick="editContactLink(${idx})" class="admin-only text-xs text-emerald-700 ml-1"><i class="fa-solid fa-pen"></i></button>
-                    <button onclick="removeContactLink(${idx})" class="admin-only text-xs text-rose-500"><i class="fa-solid fa-xmark"></i></button>
+                    <button type="button" onclick="openLinkModal(${idx})" class="admin-only text-xs text-emerald-700 hover:text-emerald-950 ml-1 p-1 cursor-pointer" title="Sửa liên kết & đổi logo">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button type="button" onclick="removeContactLink(${idx})" class="admin-only text-xs text-rose-500 hover:text-rose-700 p-1 cursor-pointer" title="Xóa liên kết">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
-            `).join("");
+                `;
+            }).join("");
 
-            // 7. Render Góc Ảnh Cá Nhân
+            // 7. Góc Ảnh Cá Nhân
             const photosGrid = document.getElementById("photos-grid");
             if (state.photos.length === 0) {
                 photosGrid.innerHTML = `<p class="text-xs text-slate-400 italic col-span-full">Chưa có ảnh nào được tải lên.</p>`;
@@ -420,7 +597,7 @@
                         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-2.5">
                             <p class="text-xs text-white font-medium truncate" contenteditable="${isAdmin}" onblur="updatePhotoCaption(${idx}, this.innerText)">${photo.caption || ''}</p>
                         </div>
-                        <button onclick="removePhoto(${idx})" class="admin-only absolute top-2 right-2 w-7 h-7 rounded-full bg-rose-600 text-white items-center justify-center text-xs shadow">
+                        <button type="button" onclick="removePhoto(${idx})" class="admin-only absolute top-2 right-2 w-7 h-7 rounded-full bg-rose-600 text-white items-center justify-center text-xs shadow">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -428,7 +605,207 @@
             }
         }
 
-        // --- QUẢN TRỊ & CHỈNH SỬA ---
+        // --- XỬ LÝ MODAL CHỌN LOGO & LIÊN KẾT (KẾT NỐI & LIÊN HỆ) ---
+        let editingLinkIndex = -1;
+        let selectedLinkIcon = "fa-brands fa-facebook";
+        let selectedCustomLogo = "";
+
+        function renderLogoPickerGrid() {
+            const grid = document.getElementById("logo-picker-grid");
+            let html = LOGO_PRESETS.map(item => {
+                const isSel = (!selectedCustomLogo && selectedLinkIcon === item.icon);
+                const previewIcon = item.icon === "zalo-svg"
+                    ? `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 text-white font-extrabold text-xs">Z</span>`
+                    : `<i class="${item.icon} text-lg text-emerald-700"></i>`;
+                return `
+                    <button type="button" onclick="selectPresetLogo('${item.icon}', '${item.name}')" class="logo-option ${isSel ? 'selected' : ''} flex flex-col items-center justify-center gap-1 p-2 rounded-xl border border-emerald-100 hover:bg-emerald-50/70 transition cursor-pointer">
+                        ${previewIcon}
+                        <span class="text-[10px] font-semibold text-slate-600 truncate w-full text-center">${item.name}</span>
+                    </button>
+                `;
+            }).join("");
+
+            if (selectedCustomLogo) {
+                html = `
+                    <button type="button" class="logo-option selected flex flex-col items-center justify-center gap-1 p-2 rounded-xl border border-emerald-500 bg-emerald-50">
+                        <img src="${selectedCustomLogo}" class="w-6 h-6 rounded-full object-cover">
+                        <span class="text-[10px] font-bold text-emerald-800">Logo riêng</span>
+                    </button>
+                ` + html;
+            }
+            grid.innerHTML = html;
+        }
+
+        function selectPresetLogo(iconClass, presetName) {
+            selectedCustomLogo = "";
+            selectedLinkIcon = iconClass;
+            const labelInput = document.getElementById("link-label-input");
+            if (!labelInput.value.trim()) {
+                labelInput.value = presetName;
+            }
+            renderLogoPickerGrid();
+        }
+
+        function uploadCustomLinkLogo(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            compressImage(file, 120, (dataUrl) => {
+                selectedCustomLogo = dataUrl;
+                renderLogoPickerGrid();
+            });
+            e.target.value = "";
+        }
+
+        function openLinkModal(idx) {
+            editingLinkIndex = idx;
+            const titleEl = document.getElementById("link-modal-title");
+            const labelInput = document.getElementById("link-label-input");
+            const urlInput = document.getElementById("link-url-input");
+
+            if (idx >= 0 && state.links[idx]) {
+                const lk = state.links[idx];
+                titleEl.innerText = "Sửa Liên Kết & Đổi Logo";
+                labelInput.value = lk.label || "";
+                urlInput.value = lk.url || "";
+                selectedLinkIcon = lk.icon || "fa-solid fa-link";
+                selectedCustomLogo = lk.customLogo || "";
+            } else {
+                titleEl.innerText = "Thêm Liên Kết Mới";
+                labelInput.value = "";
+                urlInput.value = "";
+                selectedLinkIcon = "fa-brands fa-facebook";
+                selectedCustomLogo = "";
+            }
+
+            renderLogoPickerGrid();
+            document.getElementById("link-modal").classList.remove("hidden");
+        }
+
+        function closeLinkModal() {
+            document.getElementById("link-modal").classList.add("hidden");
+        }
+
+        function saveLinkModal() {
+            const label = document.getElementById("link-label-input").value.trim();
+            const rawUrl = document.getElementById("link-url-input").value.trim();
+
+            if (!label) {
+                alert("Vui lòng nhập Tên hiển thị cho nút liên kết!");
+                return;
+            }
+
+            const finalUrl = normalizeUrl(rawUrl || "#", selectedLinkIcon);
+            const newLinkObj = {
+                label: label,
+                url: finalUrl,
+                icon: selectedLinkIcon,
+                customLogo: selectedCustomLogo
+            };
+
+            if (editingLinkIndex >= 0) {
+                state.links[editingLinkIndex] = newLinkObj;
+            } else {
+                state.links.push(newLinkObj);
+            }
+
+            saveState();
+            render();
+            closeLinkModal();
+        }
+
+        function removeContactLink(idx) {
+            state.links.splice(idx, 1);
+            saveState();
+            render();
+        }
+
+        // --- XỬ LÝ MODAL THÔNG TIN CÁ NHÂN ---
+        let editingInfoIndex = -1;
+        let selectedInfoIcon = "fa-solid fa-star";
+
+        function renderInfoIconGrid() {
+            const grid = document.getElementById("info-icon-grid");
+            grid.innerHTML = INFO_ICONS.map(ic => `
+                <button type="button" onclick="selectedInfoIcon='${ic}'; renderInfoIconGrid();" class="logo-option ${selectedInfoIcon === ic ? 'selected' : ''} h-10 rounded-xl border border-emerald-100 flex items-center justify-center text-emerald-700 hover:bg-emerald-50">
+                    <i class="${ic}"></i>
+                </button>
+            `).join("");
+        }
+
+        function openInfoModal(idx) {
+            editingInfoIndex = idx;
+            const labelInput = document.getElementById("info-label-input");
+            const valInput = document.getElementById("info-value-input");
+            if (idx >= 0 && state.personalInfo[idx]) {
+                selectedInfoIcon = state.personalInfo[idx].icon || "fa-solid fa-star";
+                labelInput.value = state.personalInfo[idx].label;
+                valInput.value = state.personalInfo[idx].value;
+            } else {
+                selectedInfoIcon = "fa-solid fa-star";
+                labelInput.value = "";
+                valInput.value = "";
+            }
+            renderInfoIconGrid();
+            document.getElementById("info-modal").classList.remove("hidden");
+        }
+
+        function closeInfoModal() {
+            document.getElementById("info-modal").classList.add("hidden");
+        }
+
+        function saveInfoModal() {
+            const lb = document.getElementById("info-label-input").value.trim().toUpperCase();
+            const vl = document.getElementById("info-value-input").value.trim();
+            if (!lb) return;
+            const obj = { icon: selectedInfoIcon, label: lb, value: vl };
+            if (editingInfoIndex >= 0) {
+                state.personalInfo[editingInfoIndex] = obj;
+            } else {
+                state.personalInfo.push(obj);
+            }
+            saveState();
+            render();
+            closeInfoModal();
+        }
+
+        // --- XỬ LÝ MODAL DỰ ÁN ---
+        let editingProjectIndex = -1;
+        function openProjectModal(idx) {
+            editingProjectIndex = idx;
+            const tInput = document.getElementById("project-title-input");
+            const dInput = document.getElementById("project-desc-input");
+            const uInput = document.getElementById("project-url-input");
+            if (idx >= 0 && state.projects[idx]) {
+                tInput.value = state.projects[idx].title;
+                dInput.value = state.projects[idx].desc;
+                uInput.value = state.projects[idx].url;
+            } else {
+                tInput.value = "";
+                dInput.value = "";
+                uInput.value = "";
+            }
+            document.getElementById("project-modal").classList.remove("hidden");
+        }
+        function closeProjectModal() {
+            document.getElementById("project-modal").classList.add("hidden");
+        }
+        function saveProjectModal() {
+            const title = document.getElementById("project-title-input").value.trim();
+            const desc = document.getElementById("project-desc-input").value.trim();
+            const url = normalizeUrl(document.getElementById("project-url-input").value.trim());
+            if (!title) return;
+            const obj = { title, desc: desc || "Dự án cá nhân", url };
+            if (editingProjectIndex >= 0) {
+                state.projects[editingProjectIndex] = obj;
+            } else {
+                state.projects.push(obj);
+            }
+            saveState();
+            render();
+            closeProjectModal();
+        }
+
+        // --- QUẢN TRỊ CHUNG ---
         function openAdminModal() {
             if (isAdmin) { logoutAdmin(); return; }
             document.getElementById("pin-input").value = "";
@@ -459,7 +836,7 @@
             if (newPin && newPin.trim()) {
                 state.pin = newPin.trim();
                 saveState();
-                alert("Đã đổi mật khẩu! Hãy bấm 'Copy Code HTML đã sửa' hoặc 'Lưu thẳng lên GitHub' để áp dụng cho mọi thiết bị.");
+                alert("Đã đổi mật khẩu! Hãy bấm 'Copy Code HTML đã sửa' để lưu cố định.");
             }
         }
 
@@ -482,13 +859,6 @@
         function updatePersonalInfo(idx, field, val) {
             state.personalInfo[idx][field] = val.trim();
             saveState();
-        }
-        function addPersonalInfo() {
-            const label = prompt("Tên mục (VD: EMAIL, SỞ THÍCH):");
-            if (!label) return;
-            const value = prompt("Nội dung:");
-            state.personalInfo.push({ icon: "fa-solid fa-star", label: label.trim().toUpperCase(), value: (value || "").trim() });
-            saveState(); render();
         }
         function removePersonalInfo(idx) {
             state.personalInfo.splice(idx, 1);
@@ -514,7 +884,7 @@
         }
         function addSkill() {
             const s = prompt("Nhập kỹ năng mới:");
-            if (s) { state.skills.push(s.trim()); saveState(); render(); }
+            if (s && s.trim()) { state.skills.push(s.trim()); saveState(); render(); }
         }
         function removeSkill(idx) {
             state.skills.splice(idx, 1);
@@ -525,39 +895,8 @@
             state.projects[idx][field] = val.trim();
             saveState();
         }
-        function editProjectUrl(idx) {
-            const url = prompt("Đường dẫn (URL) của dự án:", state.projects[idx].url);
-            if (url) { state.projects[idx].url = url.trim(); saveState(); render(); }
-        }
-        function addProject() {
-            const title = prompt("Tên dự án:");
-            if (!title) return;
-            const url = prompt("Đường dẫn dự án (URL):", "https://");
-            state.projects.push({ title: title.trim(), desc: "Mô tả ngắn gọn về dự án...", url: (url || "#").trim() });
-            saveState(); render();
-        }
         function removeProject(idx) {
             state.projects.splice(idx, 1);
-            saveState(); render();
-        }
-
-        function addContactLink() {
-            const label = prompt("Tên nút liên hệ (VD: Zalo, TikTok, Email):");
-            if (!label) return;
-            const url = prompt("Đường dẫn (URL):", "https://");
-            state.links.push({ label: label.trim(), url: (url || "#").trim(), icon: "fa-solid fa-link" });
-            saveState(); render();
-        }
-        function editContactLink(idx) {
-            const label = prompt("Tên hiển thị:", state.links[idx].label);
-            if (!label) return;
-            const url = prompt("Đường dẫn (URL):", state.links[idx].url);
-            state.links[idx].label = label.trim();
-            if (url) state.links[idx].url = url.trim();
-            saveState(); render();
-        }
-        function removeContactLink(idx) {
-            state.links.splice(idx, 1);
             saveState(); render();
         }
 
@@ -597,14 +936,13 @@
                     if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
                     canvas.width = w; canvas.height = h;
                     canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-                    callback(canvas.toDataURL("image/jpeg", 0.8));
+                    callback(canvas.toDataURL("image/jpeg", 0.82));
                 };
                 img.src = ev.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        // Tạo mã nguồn HTML hoàn chỉnh chứa dữ liệu mới nhất
         function buildUpdatedHTMLString() {
             const prevAdmin = isAdmin;
             isAdmin = false;
@@ -619,12 +957,11 @@
             return fullHtml;
         }
 
-        // 1. Copy toàn bộ code HTML đã nhúng sẵn dữ liệu mới vào bộ nhớ tạm
         async function copyUpdatedHTML() {
             const fullHtml = buildUpdatedHTMLString();
             try {
                 await navigator.clipboard.writeText(fullHtml);
-                alert("✅ Đã sao chép toàn bộ mã nguồn HTML mới (kèm dữ liệu và ảnh vừa sửa)!\n\nBạn chỉ cần mở file index.html trên GitHub và Dán (Paste) đè vào là mọi trình duyệt, điện thoại và máy tính khác đều cập nhật ngay.");
+                alert("✅ Đã Copy toàn bộ Code HTML mới!\n\nBạn chỉ cần dán (Paste) đè vào file index.html trên GitHub là mọi thiết bị đều cập nhật ngay.");
             } catch (err) {
                 const blob = new Blob([fullHtml], { type: "text/html;charset=utf-8" });
                 const a = document.createElement("a");
@@ -634,12 +971,11 @@
             }
         }
 
-        // 2. Lưu trực tiếp lên GitHub Repository qua GitHub API (không cần mở GitHub)
         async function saveToGitHub() {
             const savedRepo = localStorage.getItem("gh_repo") || "";
             const savedToken = localStorage.getItem("gh_token") || "";
 
-            const repo = prompt("Nhập tên Repository GitHub của bạn (VD: khai/khai.github.io):", savedRepo);
+            const repo = prompt("Nhập tên Repository GitHub (VD: khai/khai.github.io):", savedRepo);
             if (!repo) return;
             const token = prompt("Nhập GitHub Personal Access Token (quyền repo/contents):", savedToken);
             if (!token) return;
@@ -666,19 +1002,19 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        message: "Cập nhật hồ sơ cá nhân từ trang web",
+                        message: "Cập nhật hồ sơ cá nhân từ web",
                         content: base64Content,
                         sha: fileData.sha
                     })
                 });
 
                 if (putRes.ok) {
-                    alert("🎉 Đã lưu trực tiếp lên GitHub thành công! Sau khoảng 30 giây, mọi thiết bị truy cập duckhai.id.vn đều sẽ thấy nội dung mới.");
+                    alert("🎉 Đã lưu trực tiếp lên GitHub thành công!");
                 } else {
                     throw new Error("Không thể ghi file lên GitHub.");
                 }
             } catch (e) {
-                alert("Lỗi: " + e.message + "\n\nBạn có thể dùng nút 'Copy Code HTML đã sửa' bên cạnh để dán thủ công lên GitHub nhé!");
+                alert("Lỗi: " + e.message + "\n\nBạn hãy dùng nút 'Copy Code HTML đã sửa' để dán lên GitHub nhé!");
             }
         }
 
