@@ -1,1201 +1,688 @@
 <!DOCTYPE html>
-<html lang="vi" class="scroll-smooth">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nguyễn Đức Khải | Hồ Sơ Cá Nhân</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Font: Plus Jakarta Sans (Ấm áp, hiện đại, thân thiện) -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f2fbf5;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(167, 243, 208, 0.45) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(187, 247, 208, 0.45) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: #1f2937;
+            background: linear-gradient(180deg, #e6f7ed 0%, #f2fbf6 100%);
+            color: #143625;
         }
-
-        /* Thanh cuộn xanh lá dịu mắt */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .card-green {
+            background: #ffffff;
+            border: 1px solid #d5f0e0;
+            border-radius: 28px;
+            box-shadow: 0 8px 25px -6px rgba(16, 185, 129, 0.07);
         }
-        ::-webkit-scrollbar-track {
-            background: #ecfdf5;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #6ee7b7;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #10b981;
-        }
-
-        /* Chế độ Quản trị (Chỉ hiển thị khi chủ sở hữu mở khóa) */
-        .admin-only {
-            display: none !important;
-        }
-        .admin-block {
-            display: none !important;
-        }
-        body.admin-mode .admin-only {
-            display: inline-flex !important;
-        }
-        body.admin-mode .admin-block {
-            display: block !important;
-        }
-
-        /* Viền gợi ý khi bấm vào chữ để sửa trực tiếp */
-        body.admin-mode [contenteditable="true"] {
-            outline: 1.5px dashed #10b981;
-            outline-offset: 3px;
-            border-radius: 8px;
-            background-color: rgba(16, 185, 129, 0.06);
-            cursor: text;
+        .info-box {
+            background: #f3fbf6;
+            border: 1px solid #dcf3e5;
+            border-radius: 20px;
             transition: all 0.2s ease;
         }
-        body.admin-mode [contenteditable="true"]:hover {
-            background-color: rgba(16, 185, 129, 0.12);
+        .info-box:hover {
+            border-color: #86efac;
         }
-        body.admin-mode [contenteditable="true"]:focus {
+        /* Hiệu ứng khi bật chế độ Quản trị */
+        .admin-mode [contenteditable="true"] {
+            outline: 1.5px dashed #10b981;
+            background-color: #ecfdf5;
+            border-radius: 6px;
+            padding: 2px 6px;
+            cursor: text;
+        }
+        .admin-mode [contenteditable="true"]:focus {
             outline: 2px solid #059669;
             background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
         }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-up {
-            animation: fadeUp 0.3s ease-out forwards;
-        }
+        .admin-only { display: none !important; }
+        .admin-mode .admin-only { display: inline-flex !important; }
+        .admin-block { display: none !important; }
+        .admin-mode .admin-block { display: block !important; }
     </style>
 </head>
-<body class="min-h-screen antialiased selection:bg-emerald-500 selection:text-white pb-20">
+<body class="min-h-screen antialiased pb-20">
 
-    <!-- ==========================================
-         THANH CÔNG CỤ QUẢN TRỊ (CHỈ HIỆN KHI MỞ KHÓA)
-         ========================================== -->
-    <div id="admin-toolbar" class="admin-block sticky top-0 z-40 bg-emerald-900/95 text-white backdrop-blur-md border-b border-emerald-700 shadow-lg">
-        <div class="max-w-3xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-100">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-                    <i class="fa-solid fa-pen-nib text-emerald-300"></i>
-                    <span>Chế độ Chỉnh sửa Trực tiếp</span>
-                </div>
-                <span id="cloud-sync-badge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-800/90 text-emerald-200 border border-emerald-600/60">
-                    <i class="fa-solid fa-cloud text-emerald-300"></i>
-                    <span>Đã đồng bộ Đám mây (Mọi trình duyệt đều thấy)</span>
+    <!-- THANH CÔNG CỤ QUẢN TRỊ (CHỈ HIỆN KHI MỞ KHÓA) -->
+    <div class="admin-block sticky top-0 z-50 bg-emerald-900/95 text-white backdrop-blur-md border-b border-emerald-700 px-4 py-3 shadow-lg">
+        <div class="max-w-2xl mx-auto flex flex-col gap-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+                <span class="font-semibold text-emerald-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-pen-to-square"></i> Chế độ Quản trị: Bấm trực tiếp vào chữ để sửa
                 </span>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <button onclick="copyUpdatedHTML()" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-semibold transition shadow-sm">
+                        <i class="fa-solid fa-copy mr-1"></i>Copy Code HTML đã sửa
+                    </button>
+                    <button onclick="saveToGitHub()" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-semibold transition">
+                        <i class="fa-brands fa-github mr-1"></i>Lưu thẳng lên GitHub
+                    </button>
+                    <button onclick="changePin()" class="px-2.5 py-1.5 rounded-lg bg-emerald-800 hover:bg-emerald-700 text-emerald-100 transition" title="Đổi mật khẩu">
+                        <i class="fa-solid fa-key"></i>
+                    </button>
+                    <button onclick="logoutAdmin()" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold transition">
+                        Đóng
+                    </button>
+                </div>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <button onclick="saveAllToCloud(true)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 text-xs font-extrabold transition shadow-sm flex items-center gap-1.5" title="Lưu toàn bộ nội dung lên Đám mây ngay lập tức">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Lưu ngay lên Đám mây
-                </button>
-                <button onclick="openPasswordModal()" class="px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-xs font-semibold border border-emerald-600 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-key"></i> Đổi mật khẩu
-                </button>
-                <button onclick="lockAdminMode()" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-900 text-xs font-bold transition shadow-sm flex items-center gap-1.5">
-                    <i class="fa-solid fa-lock text-emerald-600"></i> Khóa lại (Chế độ khách)
-                </button>
-            </div>
+            <p class="text-[11px] text-emerald-200/90">
+                💡 <b>Mẹo đồng bộ mọi thiết bị:</b> Sau khi sửa hoặc thêm ảnh xong, hãy bấm <b>"Copy Code HTML đã sửa"</b> rồi dán vào file <code>index.html</code> trên GitHub (hoặc bấm <b>"Lưu thẳng lên GitHub"</b>) để mọi điện thoại/máy tính khác đều thấy ngay.
+            </p>
         </div>
     </div>
 
-    <!-- ==========================================
-         KHUNG NỘI DUNG CHÍNH (TỐI GIẢN, ẤM ÁP, 1 CỘT)
-         ========================================== -->
-    <main class="max-w-3xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 space-y-8">
+    <!-- KHUNG NỘI DUNG CHÍNH -->
+    <main class="max-w-2xl mx-auto px-4 pt-6 sm:pt-10 space-y-6">
 
-        <!-- 1. GIỚI THIỆU BẢN THÂN & THÔNG TIN CÁ NHÂN -->
-        <section class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-emerald-200/80 shadow-sm relative overflow-hidden">
-            <!-- Trang trí lá cây nhẹ nhàng ở góc -->
-            <div class="-top-12 -right-12 w-40 h-40 bg-emerald-100/70 rounded-full blur-2xl pointer-events-none absolute"></div>
-
-            <!-- Phần đầu: Ảnh đại diện + Họ tên + Lời chào -->
-            <div class="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+        <!-- 1. THẺ GIỚI THIỆU & THÔNG TIN CÁ NHÂN -->
+        <section class="card-green p-6 sm:p-8">
+            <div class="flex flex-col items-center text-center">
                 <!-- Ảnh đại diện -->
-                <div class="relative group shrink-0">
-                    <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1.5 bg-gradient-to-tr from-emerald-500 via-teal-400 to-green-300 shadow-md">
-                        <img id="avatar-img" src="" alt="Nguyễn Đức Khải" onerror="this.src='https://placehold.co/400x400/10b981/ffffff?text=Kh%E1%BA%A3i'" class="w-full h-full rounded-full object-cover bg-emerald-50 border-2 border-white">
-                    </div>
-                    <!-- Nút đổi ảnh đại diện (Chỉ hiện ở chế độ sửa) -->
-                    <label class="admin-only absolute inset-1.5 rounded-full bg-emerald-950/75 text-white text-xs font-bold flex-col items-center justify-center cursor-pointer transition hover:bg-emerald-900/85">
-                        <i class="fa-solid fa-camera text-lg mb-1 text-emerald-300"></i>
-                        <span>Đổi ảnh</span>
-                        <input type="file" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+                <div class="relative group mb-4">
+                    <img id="avatar-img" src="" alt="Nguyễn Đức Khải" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-emerald-100 shadow-md bg-emerald-50">
+                    <label class="admin-only absolute inset-0 rounded-full bg-black/55 text-white text-xs font-medium items-center justify-center cursor-pointer">
+                        <i class="fa-solid fa-camera mr-1"></i>Đổi ảnh
+                        <input type="file" accept="image/*" class="hidden" onchange="updateAvatar(event)">
                     </label>
                 </div>
 
-                <!-- Tên, Danh xưng & Giới thiệu ngắn -->
-                <div class="flex-1 space-y-2">
-                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-semibold">
-                            <i class="fa-solid fa-seedling text-emerald-600"></i>
-                            <span>Hồ sơ cá nhân</span>
-                        </div>
-                        <span id="public-sync-dot" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-medium border border-emerald-200/70">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span id="public-sync-text">Đồng bộ đám mây</span>
-                        </span>
-                    </div>
-                    <h1 id="profile-name" class="text-2xl sm:text-3xl font-extrabold text-emerald-950 tracking-tight" onblur="updateBasicField('name', this.innerText)"></h1>
-                    <p id="profile-role" class="text-emerald-700 font-semibold text-sm sm:text-base" onblur="updateBasicField('role', this.innerText)"></p>
-                    <p id="profile-bio" class="text-slate-600 text-sm leading-relaxed pt-1" onblur="updateBasicField('bio', this.innerText)"></p>
+                <!-- Nhãn Hồ sơ cá nhân (Đã bỏ nhãn Đồng bộ đám mây) -->
+                <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold mb-3">
+                    <i class="fa-solid fa-seedling text-emerald-600"></i>
+                    <span>Hồ sơ cá nhân</span>
                 </div>
+
+                <!-- Họ tên & Chức danh -->
+                <h1 id="profile-name" class="text-2xl sm:text-3xl font-extrabold text-emerald-950 tracking-tight" onblur="saveField('name', this.innerText)"></h1>
+                <p id="profile-role" class="text-emerald-700 font-semibold text-sm sm:text-base mt-1.5" onblur="saveField('role', this.innerText)"></p>
+                <p id="profile-bio" class="text-slate-600 text-sm sm:text-[15px] leading-relaxed mt-3 max-w-xl" onblur="saveField('bio', this.innerText)"></p>
             </div>
 
-            <!-- Đường kẻ phân cách dịu nhẹ -->
-            <div class="my-6 border-t border-emerald-100"></div>
+            <hr class="border-emerald-100 my-7">
 
-            <!-- LƯỚI THÔNG TIN CÁ NHÂN (NGÀY SINH, QUÊ QUÁN, HỌC VẤN, SỞ THÍCH...) -->
+            <!-- MỤC THÔNG TIN CÁ NHÂN -->
             <div>
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-2">
-                        <i class="fa-regular fa-id-card text-emerald-600 text-sm"></i>
-                        <span>Thông Tin Cá Nhân</span>
+                    <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-2">
+                        <i class="fa-regular fa-id-card text-emerald-600"></i>
+                        <span>Thông tin cá nhân</span>
                     </h2>
-                    <button onclick="openPersonalInfoModal()" class="admin-only items-center gap-1.5 text-xs font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl transition">
-                        <i class="fa-solid fa-plus"></i> Thêm thông tin
+                    <button onclick="addPersonalInfo()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg">
+                        <i class="fa-solid fa-plus"></i> Thêm mục
                     </button>
                 </div>
 
-                <div id="personal-info-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <!-- Được tạo tự động từ dữ liệu Cloud -->
-                </div>
+                <div id="info-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
             </div>
         </section>
 
-        <!-- 2. HỌC VẤN, KINH NGHIỆM & KỸ NĂNG -->
-        <section class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-emerald-200/80 shadow-sm space-y-6">
-            <!-- Học vấn & Kinh nghiệm -->
+        <!-- 2. HỌC VẤN & QUÁ TRÌNH PHÁT TRIỂN + KỸ NĂNG -->
+        <section class="card-green p-6 sm:p-8">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-emerald-950">Học Vấn & Quá Trình Phát Triển</h2>
+                </div>
+                <button onclick="addTimeline()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1.5 rounded-lg shrink-0">
+                    <i class="fa-solid fa-plus"></i> Thêm mốc
+                </button>
+            </div>
+
+            <!-- Danh sách mốc thời gian -->
+            <div id="timeline-list" class="space-y-6 pl-2"></div>
+
+            <hr class="border-emerald-100 my-7">
+
+            <!-- Kỹ năng & Công cụ yêu thích -->
             <div>
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-base sm:text-lg font-extrabold text-emerald-950 flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        </span>
-                        <span>Học Vấn & Kinh Nghiệm</span>
-                    </h2>
-                    <button onclick="openTimelineModal()" class="admin-only items-center gap-1.5 text-xs font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl transition">
-                        <i class="fa-solid fa-plus"></i> Thêm cột mốc
+                    <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i>
+                        <span>Kỹ năng & Công cụ yêu thích</span>
+                    </h3>
+                    <button onclick="addSkill()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg">
+                        <i class="fa-solid fa-plus"></i> Thêm kỹ năng
                     </button>
                 </div>
-
-                <div id="timeline-list" class="space-y-4 pl-2">
-                    <!-- Được tạo tự động từ dữ liệu Cloud -->
-                </div>
-            </div>
-
-            <div class="border-t border-emerald-100"></div>
-
-            <!-- Kỹ năng & Thành tựu -->
-            <div class="space-y-4">
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-2">
-                            <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i>
-                            <span>Kỹ Năng & Công Cụ</span>
-                        </h3>
-                        <button onclick="openSkillModal()" class="admin-only items-center gap-1.5 text-xs font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl transition">
-                            <i class="fa-solid fa-plus"></i> Thêm kỹ năng
-                        </button>
-                    </div>
-                    <div id="skills-list" class="flex flex-wrap gap-2">
-                        <!-- Được tạo tự động từ dữ liệu Cloud -->
-                    </div>
-                </div>
-
-                <!-- Ghi chú Thành tựu & Mục tiêu -->
-                <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-start gap-3">
-                    <i class="fa-solid fa-award text-emerald-600 text-base mt-0.5 shrink-0"></i>
-                    <p id="achievements-text" class="text-xs sm:text-sm text-emerald-950/90 leading-relaxed flex-1" onblur="updateBasicField('achievements', this.innerText)"></p>
-                </div>
+                <div id="skills-list" class="flex flex-wrap gap-2.5"></div>
             </div>
         </section>
 
-        <!-- 3. DỰ ÁN ĐÃ THỰC HIỆN (PORTFOLIO) -->
-        <section class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-emerald-200/80 shadow-sm">
-            <div class="flex items-center justify-between mb-5">
-                <div>
-                    <h2 class="text-base sm:text-lg font-extrabold text-emerald-950 flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm">
-                            <i class="fa-solid fa-folder-open"></i>
-                        </span>
-                        <span>Dự Án Đã Thực Hiện</span>
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-1">Bấm vào từng dự án để mở đường dẫn sản phẩm hoặc mã nguồn</p>
+        <!-- 3. DỰ ÁN ĐÃ THỰC HIỆN -->
+        <section class="card-green p-6 sm:p-8">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-folder-open text-lg"></i>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-emerald-950">Dự Án Đã Thực Hiện</h2>
                 </div>
-                <button onclick="openProjectModal()" class="admin-only items-center gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl shadow-sm transition">
+                <button onclick="addProject()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1.5 rounded-lg shrink-0">
                     <i class="fa-solid fa-plus"></i> Thêm dự án
                 </button>
             </div>
-
-            <div id="projects-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Được tạo tự động từ dữ liệu Cloud -->
-            </div>
+            <p class="text-slate-500 text-xs sm:text-sm mb-4">Bấm vào từng dự án để truy cập đường dẫn chi tiết</p>
+            <div id="projects-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
         </section>
 
-        <!-- 4. LIÊN KẾT & LIÊN HỆ -->
-        <section class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-emerald-200/80 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-base sm:text-lg font-extrabold text-emerald-950 flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </span>
-                        <span>Liên Kết & Liên Hệ</span>
-                    </h2>
+        <!-- 4. KẾT NỐI & LIÊN HỆ -->
+        <section class="card-green p-6 sm:p-8">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-paper-plane text-lg"></i>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-emerald-950">Kết Nối & Liên Hệ</h2>
                 </div>
-                <button onclick="openLinkModal()" class="admin-only items-center gap-1.5 text-xs font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl transition">
+                <button onclick="addContactLink()" class="admin-only items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1.5 rounded-lg shrink-0">
                     <i class="fa-solid fa-plus"></i> Thêm liên kết
                 </button>
             </div>
-
-            <div id="links-list" class="flex flex-wrap gap-3">
-                <!-- Được tạo tự động từ dữ liệu Cloud -->
-            </div>
+            <div id="links-list" class="flex flex-wrap gap-3"></div>
         </section>
 
-        <!-- 5. GÓC ẢNH CÁ NHÂN (Ở CUỐI TRANG - LƯU LÊN ĐÁM MÂY) -->
-        <section class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-emerald-200/80 shadow-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div>
-                    <h2 class="text-base sm:text-lg font-extrabold text-emerald-950 flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm">
-                            <i class="fa-solid fa-images"></i>
-                        </span>
-                        <span>Góc Ảnh Cá Nhân & Đời Sống</span>
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-1">Ảnh tải lên được lưu trữ trên đám mây, hiển thị trên mọi thiết bị</p>
+        <!-- 5. GÓC ẢNH CÁ NHÂN (Ở CUỐI TRANG) -->
+        <section class="card-green p-6 sm:p-8">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-images text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-extrabold text-emerald-950">Góc Ảnh Cá Nhân</h2>
+                        <p class="text-slate-500 text-xs">Những khoảnh khắc học tập và cuộc sống thường ngày</p>
+                    </div>
                 </div>
-
-                <!-- Nút tải ảnh mới lên (Chỉ hiện khi Chủ sở hữu mở khóa) -->
-                <label class="admin-only items-center justify-center gap-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-2xl cursor-pointer shadow-md shadow-emerald-600/20 transition shrink-0">
-                    <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
-                    <span>+ Tải ảnh lên Đám mây</span>
-                    <input type="file" accept="image/*" multiple class="hidden" onchange="handleGalleryUpload(event)">
+                <label class="admin-only items-center gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl cursor-pointer transition shadow-sm shrink-0">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Tải ảnh lên
+                    <input type="file" accept="image/*" multiple class="hidden" onchange="uploadPhotos(event)">
                 </label>
             </div>
-
-            <div id="photos-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <!-- Được tạo tự động từ dữ liệu Cloud -->
-            </div>
+            <div id="photos-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3.5"></div>
         </section>
 
     </main>
 
-    <!-- ==========================================
-         CHÂN TRANG (FOOTER) & NÚT MỞ KHÓA QUẢN TRỊ
-         ========================================== -->
-    <footer class="max-w-3xl mx-auto px-6 pt-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-800/70">
-        <div class="flex items-center gap-2 font-medium">
-            <i class="fa-solid fa-leaf text-emerald-600"></i>
-            <span>© <span id="current-year"></span> Nguyễn Đức Khải • kproxy.shop</span>
-        </div>
-        <button onclick="handleAdminTrigger()" id="footer-admin-btn" class="px-3.5 py-1.5 rounded-full bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-800 font-semibold transition flex items-center gap-1.5">
-            <i class="fa-solid fa-lock text-[11px]"></i>
-            <span>Quản trị</span>
+    <!-- CHÂN TRANG -->
+    <footer class="max-w-2xl mx-auto px-6 pt-8 flex items-center justify-between text-xs text-emerald-800/60">
+        <span>© <span id="year"></span> Nguyễn Đức Khải • duckhai.id.vn</span>
+        <button onclick="openAdminModal()" class="hover:text-emerald-800 transition flex items-center gap-1 font-medium">
+            <i class="fa-solid fa-lock text-[10px]"></i> <span>Quản trị</span>
         </button>
     </footer>
 
-    <!-- ==========================================
-         LIGHTBOX XEM ẢNH PHÓNG TO (DÀNH CHO KHÁCH XEM)
-         ========================================== -->
-    <div id="lightbox-modal" onclick="closeLightbox()" class="hidden fixed inset-0 z-50 bg-emerald-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 cursor-zoom-out">
-        <img id="lightbox-img" src="" alt="Ảnh phóng to" class="max-h-[82vh] max-w-[92vw] rounded-2xl shadow-2xl border-2 border-white/20 object-contain">
-        <p id="lightbox-caption" class="mt-3 text-sm font-medium text-emerald-50 bg-emerald-900/80 px-4 py-1.5 rounded-full"></p>
-    </div>
-
-    <!-- ==========================================
-         HỘP THOẠI (MODAL) ĐĂNG NHẬP & THÊM NỘI DUNG
-         (Thay thế hoàn toàn prompt/alert của trình duyệt)
-         ========================================== -->
-    <div id="custom-modal-backdrop" class="hidden fixed inset-0 z-50 bg-emerald-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-emerald-200 shadow-2xl animate-fade-up">
-            <div class="flex items-center justify-between pb-3 border-b border-emerald-100">
-                <h3 id="modal-title" class="text-base font-extrabold text-emerald-950">Tiêu đề</h3>
-                <button onclick="closeCustomModal()" class="w-8 h-8 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- HỘP THOẠI NHẬP MẬT KHẨU QUẢN TRỊ -->
+    <div id="pin-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-emerald-100 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-emerald-950 text-base">Mở khóa Chỉnh sửa</h3>
+                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="modal-body" class="py-4 space-y-3 text-sm">
-                <!-- Nội dung form động -->
-            </div>
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-emerald-100">
-                <button onclick="closeCustomModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
-                    Hủy
-                </button>
-                <button id="modal-confirm-btn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-sm">
-                    Xác nhận
-                </button>
+            <p class="text-xs text-slate-500">Nhập mật khẩu chủ sở hữu để chỉnh sửa trực tiếp trên trang web:</p>
+            <input id="pin-input" type="password" placeholder="Nhập mật khẩu..." class="w-full px-3.5 py-2.5 rounded-xl border border-emerald-200 focus:outline-none focus:border-emerald-500 text-sm" onkeydown="if(event.key==='Enter') verifyPin()">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeAdminModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Hủy</button>
+                <button onclick="verifyPin()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white">Mở khóa</button>
             </div>
         </div>
     </div>
 
-    <!-- THÔNG BÁO NHỎ (TOAST) -->
-    <div id="toast-box" class="hidden fixed bottom-5 right-5 z-50 bg-emerald-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-emerald-700 flex items-center gap-2.5 text-xs sm:text-sm font-semibold animate-fade-up">
-        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toast-text">Đã lưu lên Đám mây!</span>
+    <!-- XEM ẢNH PHÓNG TO -->
+    <div id="lightbox" onclick="this.classList.add('hidden')" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out">
+        <img id="lightbox-img" src="" class="max-h-[90vh] max-w-[92vw] rounded-2xl object-contain">
     </div>
 
-    <!-- ==========================================
-         DỮ LIỆU MẶC ĐỊNH CỦA NGUYỄN ĐỨC KHẢI
-         ========================================== -->
+    <!-- DỮ LIỆU GỐC ĐÃ CẬP NHẬT THEO ĐÚNG ẢNH CỦA BẠN -->
     <script id="initial-data">
+        window.DATA_VERSION = "20261020_v3";
         window.DEFAULT_DATA = {
             pin: "1234",
-            avatar: "https://placehold.co/400x400/10b981/ffffff?text=Kh%E1%BA%A3i",
+            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
             name: "Nguyễn Đức Khải",
-            role: "Sinh viên Kỹ thuật Máy tính (CNTT) • Trường Đại học Hùng Vương",
-            bio: "Chào bạn! Mình là Khải — một người yêu thích lập trình Python, C/C++, tìm hiểu hệ thống nhúng và quản trị mạng. Mình thích sự tối giản, thực tế và luôn tìm cách ứng dụng công nghệ để việc học tập, cuộc sống trở nên gọn gàng hơn.",
-            achievements: "Trúng tuyển chương trình Kỹ thuật Máy tính (CNTT) tại ĐH Hùng Vương • Xây dựng công cụ tự động hóa xuất tài liệu bằng Python • Mục tiêu chinh phục chứng chỉ tiếng Anh Aptis ESOL B1.",
+            role: "Sinh viên CNTT (IoT) • Yêu thích Embedded System",
+            bio: "Xin chào! Mình là Khải, sinh viên ngành Công Nghệ Thông Tin tại Trường Đại học Hùng Vương. Mình đam mê lập trình Nhúng tự động hóa, khám phá hệ thống máy tính và tích hợp AI vào công cụ để phát triển.",
             personalInfo: [
-                { icon: "fa-solid fa-cake-candles", label: "Ngày tháng năm sinh", value: "29/09/2007" },
-                { icon: "fa-solid fa-location-dot", label: "Quê quán / Nơi ở", value: "Việt Trì, Phú Thọ" },
-                { icon: "fa-solid fa-graduation-cap", label: "Trường theo học", value: "Đại học Hùng Vương (HVU)" },
-                { icon: "fa-solid fa-microchip", label: "Chuyên ngành", value: "Kỹ thuật Máy tính (CNTT)" },
-                { icon: "fa-solid fa-globe", label: "Website cá nhân", value: "kproxy.shop" },
-                { icon: "fa-solid fa-heart", label: "Sở thích", value: "Lập trình, Thể thao, Cờ & Giải đố" }
+                { icon: "fa-solid fa-cake-candles", label: "NGÀY SINH", value: "29/09/2007" },
+                { icon: "fa-solid fa-location-dot", label: "QUÊ QUÁN / NƠI Ở", value: "Trường Sinh, Tuyên Quang" },
+                { icon: "fa-solid fa-building-columns", label: "TRƯỜNG HỌC", value: "ĐH Hùng Vương (HVU)" },
+                { icon: "fa-solid fa-microchip", label: "CHUYÊN NGÀNH", value: "Kỹ thuật Máy tính (CNTT)" },
+                { icon: "fa-solid fa-globe", label: "WEBSITE CÁ NHÂN", value: "duckhai.id.vn" },
+                { icon: "fa-solid fa-heart", label: "SỞ THÍCH", value: "Thích Code và yêu thích bản mạch" }
             ],
             timeline: [
                 {
-                    time: "2025 - Hiện tại",
-                    title: "Sinh viên Kỹ thuật Máy tính (CNTT) - Trường Đại học Hùng Vương",
-                    desc: "Theo học lập trình C/C++, Python, kiến trúc máy tính, hệ thống nhúng và toán ứng dụng CNTT tại Việt Trì, Phú Thọ."
+                    time: "8/2026 – Hiện tại",
+                    title: "Sinh viên Đại Học Hùng Vương",
+                    desc: "Quyết định chọn ngành CNTT chuyên về lập trình Nhúng, vì ước mơ tạo ra nhiều con Robot bằng những thứ nhỏ nhất từ bản mạch của nó đến mức hoàn thiện như một con người."
                 },
                 {
-                    time: "2025 - Hiện tại",
-                    title: "Quản trị Web & Hệ thống Ảo hóa (kproxy.shop)",
-                    desc: "Vận hành tên miền kproxy.shop, triển khai môi trường máy ảo Linux/Windows trên VMware và viết script Python tự động hóa công việc."
+                    time: "10/2025 – 8/2026",
+                    title: "Đi Làm công ty BYD Phú Hà",
+                    desc: "May mắn khi được lấy vào vị trí sửa hàng của công ty, sửa hàng tìm hiểu được cách vận hành của bản mạch, chip điện tử hoạt động như thế nào,... được chính tay tìm tòi và vận hành một con máy tự động ở công ty. Lúc đó lại càng đam mê về công nghệ nhiều và những thứ tự động hơn."
+                },
+                {
+                    time: "9/2025",
+                    title: "Lên Thái Nguyên nhập học ICTU",
+                    desc: "Nhập học hôm trước, hôm sau làm đơn rút hồ sơ nghỉ học luôn :))"
+                },
+                {
+                    time: "7/2025 – 8/2025",
+                    title: "Đi làm thêm ở Goertek Bắc Ninh",
+                    desc: "Công nhân"
+                },
+                {
+                    time: "6/2025",
+                    title: "Tốt Nghiệp THPT Kim Xuyên",
+                    desc: "Ngôi trường thân yêu ❤️"
                 }
             ],
             skills: [
-                "Python",
-                "C / C++",
-                "Hệ thống nhúng",
-                "VMware & Linux",
-                "Quản trị Web / DNS",
-                "Tự động hóa Office"
+                "Lập trình Python",
+                "Tự động hóa Word & Excel",
+                "Tiếng Anh Aptis B1",
+                "Rèn luyện thể lực mỗi ngày",
+                "Ứng dụng AI"
             ],
-            projects: [
-                {
-                    title: "Website & Tên miền kproxy.shop",
-                    desc: "Triển khai, cấu hình bản ghi DNS và quản trị hosting vận hành website cá nhân ổn định.",
-                    url: "https://kproxy.shop"
-                },
-                {
-                    title: "Tự động hóa Excel & Word bằng Python",
-                    desc: "Sử dụng thư viện openpyxl và python-docx để xuất tự động bảng 44 âm IPA và sổ tay tra cứu lệnh lập trình.",
-                    url: "https://github.com"
-                },
-                {
-                    title: "Hệ thống Lab Ảo hóa VMware & SFTP",
-                    desc: "Xây dựng mạng máy ảo hỗn hợp Windows & Linux, kết nối truyền file nội bộ an toàn qua giao thức SFTP.",
-                    url: "https://github.com"
-                },
-                {
-                    title: "Giải đố Sudoku bằng thuật toán Python",
-                    desc: "Áp dụng thuật toán quay lui (Backtracking) giải câu đố logic và rèn luyện phản xạ nhận thức.",
-                    url: "https://github.com"
-                }
-            ],
+            projects: [],
             links: [
-                { label: "Website kproxy.shop", url: "https://kproxy.shop", icon: "fa-solid fa-globe" },
-                { label: "GitHub", url: "https://github.com", icon: "fa-brands fa-github" },
-                { label: "Facebook", url: "https://facebook.com", icon: "fa-brands fa-facebook" },
-                { label: "Email liên hệ", url: "mailto:contact@kproxy.shop", icon: "fa-solid fa-envelope" }
+                { label: "Facebook Cá Nhân", url: "https://facebook.com", icon: "fa-brands fa-facebook" },
+                { label: "GitHub Dự Án", url: "https://github.com", icon: "fa-brands fa-github" }
             ],
-            photos: [
-                {
-                    id: "default_photo_1",
-                    url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80",
-                    caption: "Góc học tập & viết code Python mỗi tối",
-                    createdAt: 1700000003000
-                },
-                {
-                    id: "default_photo_2",
-                    url: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&auto=format&fit=crop&q=80",
-                    caption: "Không gian xanh mát quê hương Phú Thọ",
-                    createdAt: 1700000002000
-                },
-                {
-                    id: "default_photo_3",
-                    url: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&auto=format&fit=crop&q=80",
-                    caption: "Duy trì thói quen rèn luyện thể lực hàng ngày",
-                    createdAt: 1700000001000
-                }
-            ]
+            photos: []
         };
     </script>
 
-    <!-- ==========================================
-         HỆ THỐNG LƯU TRỮ ĐÁM MÂY FIREBASE FIRESTORE
-         (ĐỒNG BỘ THỜI GIAN THỰC TRÊN MỌI TRÌNH DUYỆT)
-         ========================================== -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Khởi tạo trạng thái ban đầu từ DEFAULT_DATA
-        let state = JSON.parse(JSON.stringify(window.DEFAULT_DATA));
-        let photosList = [...window.DEFAULT_DATA.photos];
+    <!-- BỘ XỬ LÝ GIAO DIỆN & ĐỒNG BỘ -->
+    <script>
+        const STORAGE_KEY = "duckhai_portfolio_" + window.DATA_VERSION;
+        let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || JSON.parse(JSON.stringify(window.DEFAULT_DATA));
         let isAdmin = false;
-        let currentUser = null;
-        let db = null;
-        let appId = typeof __app_id !== "undefined" ? __app_id : "khai-personal-portfolio";
 
-        document.getElementById("current-year").innerText = new Date().getFullYear();
+        document.getElementById("year").innerText = new Date().getFullYear();
 
-        // Cập nhật huy hiệu trạng thái Cloud
-        function setCloudBadge(status, message) {
-            const adminBadge = document.getElementById("cloud-sync-badge");
-            const publicText = document.getElementById("public-sync-text");
-            if (status === "saving") {
-                if (adminBadge) {
-                    adminBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-300"></i> <span>${message || "Đang lưu lên Đám mây..."}</span>`;
-                }
-                if (publicText) publicText.innerText = "Đang đồng bộ...";
-            } else if (status === "saved") {
-                if (adminBadge) {
-                    adminBadge.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-300"></i> <span>${message || "Đã lưu đồng bộ Cloud (Mọi trình duyệt đều thấy)"}</span>`;
-                }
-                if (publicText) publicText.innerText = "Đã đồng bộ Đám mây";
-            } else if (status === "error") {
-                if (adminBadge) {
-                    adminBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-300"></i> <span>${message || "Lỗi kết nối Cloud"}</span>`;
-                }
-            }
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
-        function showToast(msg) {
-            const box = document.getElementById("toast-box");
-            document.getElementById("toast-text").innerText = msg;
-            box.classList.remove("hidden");
-            clearTimeout(window.toastTimer);
-            window.toastTimer = setTimeout(() => box.classList.add("hidden"), 2800);
-        }
-
-        // Lưu hồ sơ chính lên Firestore Document: artifacts/{appId}/public/data/site_config/main_profile
-        async function saveAllToCloud(showNotification = false) {
-            if (!currentUser || !db) return;
-            try {
-                setCloudBadge("saving", "☁️ Đang lưu lên Đám mây...");
-                const profileRef = doc(db, "artifacts", appId, "public", "data", "site_config", "main_profile");
-                const payload = {
-                    pin: state.pin || "1234",
-                    avatar: state.avatar || "",
-                    name: state.name || "",
-                    role: state.role || "",
-                    bio: state.bio || "",
-                    achievements: state.achievements || "",
-                    personalInfo: state.personalInfo || [],
-                    timeline: state.timeline || [],
-                    skills: state.skills || [],
-                    projects: state.projects || [],
-                    links: state.links || [],
-                    photosSeeded: true,
-                    updatedAt: Date.now()
-                };
-                await setDoc(profileRef, payload, { merge: true });
-                setCloudBadge("saved", "✅ Đã lưu đồng bộ Cloud (Mọi trình duyệt đều thấy)");
-                if (showNotification) {
-                    showToast("Đã lưu đồng bộ lên Đám mây thành công!");
-                }
-            } catch (error) {
-                console.error("Lỗi khi lưu lên Cloud:", error);
-                setCloudBadge("error", "Không thể lưu lên Cloud");
-                showToast("Có lỗi khi lưu lên Đám mây, vui lòng thử lại!");
-            }
-        }
-
-        // Hàm vẽ giao diện
-        function renderAll() {
+        function render() {
             document.body.classList.toggle("admin-mode", isAdmin);
 
-            const footerBtn = document.getElementById("footer-admin-btn");
-            if (isAdmin) {
-                footerBtn.innerHTML = `<i class="fa-solid fa-unlock text-emerald-600"></i> <span>Đang mở Quản trị (Bấm để khóa)</span>`;
-            } else {
-                footerBtn.innerHTML = `<i class="fa-solid fa-lock text-[11px]"></i> <span>Quản trị</span>`;
-            }
-
-            // 1. Render Thông tin cơ bản
-            const avatarEl = document.getElementById("avatar-img");
-            if (avatarEl && state.avatar) avatarEl.src = state.avatar;
-
+            // 1. Render Header
+            document.getElementById("avatar-img").src = state.avatar;
             const nameEl = document.getElementById("profile-name");
             const roleEl = document.getElementById("profile-role");
             const bioEl = document.getElementById("profile-bio");
-            const achEl = document.getElementById("achievements-text");
 
-            if (document.activeElement !== nameEl) nameEl.innerText = state.name || "";
-            if (document.activeElement !== roleEl) roleEl.innerText = state.role || "";
-            if (document.activeElement !== bioEl) bioEl.innerText = state.bio || "";
-            if (document.activeElement !== achEl) achEl.innerText = state.achievements || "";
+            nameEl.innerText = state.name;
+            roleEl.innerText = state.role;
+            bioEl.innerText = state.bio;
 
-            [nameEl, roleEl, bioEl, achEl].forEach(el => {
-                el.contentEditable = isAdmin ? "true" : "false";
-            });
+            [nameEl, roleEl, bioEl].forEach(el => el.contentEditable = isAdmin ? "true" : "false");
 
-            // 2. Render Lưới Thông Tin Cá Nhân (Ngày sinh, Quê quán...)
-            const infoGrid = document.getElementById("personal-info-grid");
-            infoGrid.innerHTML = (state.personalInfo || []).map((item, idx) => `
-                <div class="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100/90 hover:border-emerald-200 transition">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                        <div class="w-9 h-9 rounded-xl bg-white text-emerald-600 shadow-sm border border-emerald-100 flex items-center justify-center shrink-0">
-                            <i class="${item.icon || 'fa-solid fa-circle-info'} text-sm"></i>
+            // 2. Render Thông tin cá nhân
+            const infoGrid = document.getElementById("info-grid");
+            infoGrid.innerHTML = state.personalInfo.map((item, idx) => `
+                <div class="info-box p-4 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="w-11 h-11 rounded-2xl bg-white border border-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
+                            <i class="${item.icon || 'fa-solid fa-circle-info'} text-base"></i>
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-[11px] font-semibold text-emerald-700/80 uppercase tracking-wide" contenteditable="${isAdmin}" onblur="updatePersonalInfo(${idx}, 'label', this.innerText)">${item.label}</div>
-                            <div class="text-sm font-bold text-slate-800 truncate" contenteditable="${isAdmin}" onblur="updatePersonalInfo(${idx}, 'value', this.innerText)">${item.value}</div>
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-700/80" contenteditable="${isAdmin}" onblur="updatePersonalInfo(${idx}, 'label', this.innerText)">${item.label}</p>
+                            <p class="text-sm sm:text-[15px] font-bold text-emerald-950 truncate" contenteditable="${isAdmin}" onblur="updatePersonalInfo(${idx}, 'value', this.innerText)">${item.value}</p>
                         </div>
                     </div>
-                    <button onclick="deletePersonalInfo(${idx})" class="admin-only w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-500 items-center justify-center text-xs shrink-0" title="Xóa mục này">
-                        <i class="fa-solid fa-trash-can"></i>
+                    <button onclick="removePersonalInfo(${idx})" class="admin-only text-rose-500 hover:text-rose-600 text-xs p-1 shrink-0" title="Xóa mục này">
+                        <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
             `).join("");
 
-            // 3. Render Học vấn & Kinh nghiệm
+            // 3. Render Học vấn & Quá trình phát triển
             const timelineList = document.getElementById("timeline-list");
-            timelineList.innerHTML = (state.timeline || []).map((item, idx) => `
-                <div class="relative pl-5 border-l-2 border-emerald-300 space-y-1">
-                    <span class="-left-[7px] top-1.5 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-50 absolute"></span>
+            timelineList.innerHTML = state.timeline.map((item, idx) => `
+                <div class="relative pl-6 border-l-2 border-emerald-300 space-y-1.5">
+                    <span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow"></span>
                     <div class="flex items-center justify-between gap-2">
-                        <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'time', this.innerText)">${item.time}</span>
-                        <button onclick="deleteTimeline(${idx})" class="admin-only text-xs text-rose-500 hover:text-rose-600 px-2 py-1 rounded-lg hover:bg-rose-50">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        <span class="inline-block px-3 py-0.5 rounded-full bg-emerald-100/90 text-emerald-800 text-xs font-bold" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'time', this.innerText)">${item.time}</span>
+                        <button onclick="removeTimeline(${idx})" class="admin-only text-rose-500 hover:text-rose-600 text-xs"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                    <h3 class="text-sm sm:text-base font-bold text-emerald-950 pt-0.5" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'title', this.innerText)">${item.title}</h3>
-                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'desc', this.innerText)">${item.desc}</p>
+                    <h3 class="text-base font-extrabold text-emerald-950 pt-0.5" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'title', this.innerText)">${item.title}</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed" contenteditable="${isAdmin}" onblur="updateTimeline(${idx}, 'desc', this.innerText)">${item.desc}</p>
                 </div>
             `).join("");
 
             // 4. Render Kỹ năng
             const skillsList = document.getElementById("skills-list");
-            skillsList.innerHTML = (state.skills || []).map((skill, idx) => `
-                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200/80 shadow-sm">
-                    <i class="fa-solid fa-check text-emerald-500 text-[10px]"></i>
+            skillsList.innerHTML = state.skills.map((skill, idx) => `
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50/90 border border-emerald-200 text-emerald-900 text-xs sm:text-sm font-semibold">
+                    <i class="fa-solid fa-check text-emerald-600 text-xs"></i>
                     <span contenteditable="${isAdmin}" onblur="updateSkill(${idx}, this.innerText)">${skill}</span>
-                    <button onclick="deleteSkill(${idx})" class="admin-only text-rose-500 hover:text-rose-700 ml-1" title="Xóa kỹ năng">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <button onclick="removeSkill(${idx})" class="admin-only text-rose-500 hover:text-rose-600 ml-1"><i class="fa-solid fa-xmark"></i></button>
                 </span>
             `).join("");
 
             // 5. Render Dự án
-            const projectsGrid = document.getElementById("projects-grid");
-            projectsGrid.innerHTML = (state.projects || []).map((proj, idx) => `
-                <div class="group p-5 rounded-2xl bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-200/70 hover:border-emerald-300 transition flex flex-col justify-between gap-3 shadow-sm">
-                    <div class="space-y-1.5">
-                        <div class="flex items-start justify-between gap-2">
-                            <h3 class="font-bold text-emerald-950 text-sm sm:text-base group-hover:text-emerald-700 transition" contenteditable="${isAdmin}" onblur="updateProject(${idx}, 'title', this.innerText)">${proj.title}</h3>
-                            <div class="flex items-center gap-1.5 shrink-0">
-                                <button onclick="openEditProjectUrlModal(${idx})" class="admin-only w-7 h-7 rounded-lg bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-200 items-center justify-center text-xs" title="Sửa đường link dự án">
-                                    <i class="fa-solid fa-link"></i>
-                                </button>
-                                <button onclick="deleteProject(${idx})" class="admin-only w-7 h-7 rounded-lg bg-white hover:bg-rose-50 text-rose-500 border border-rose-200 items-center justify-center text-xs" title="Xóa dự án">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
+            const projectsList = document.getElementById("projects-list");
+            if (state.projects.length === 0) {
+                projectsList.innerHTML = isAdmin
+                    ? `<p class="text-xs text-slate-400 italic col-span-full">Chưa có dự án nào. Hãy bấm "+ Thêm dự án" ở góc phải để thêm.</p>`
+                    : ``;
+            } else {
+                projectsList.innerHTML = state.projects.map((proj, idx) => `
+                    <div class="info-box p-4 flex flex-col justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="font-bold text-emerald-950 text-sm sm:text-base" contenteditable="${isAdmin}" onblur="updateProject(${idx}, 'title', this.innerText)">${proj.title}</h3>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <button onclick="editProjectUrl(${idx})" class="admin-only text-xs text-emerald-700" title="Sửa link"><i class="fa-solid fa-link"></i></button>
+                                    <button onclick="removeProject(${idx})" class="admin-only text-xs text-rose-500" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                             </div>
+                            <p class="text-slate-600 text-xs leading-relaxed" contenteditable="${isAdmin}" onblur="updateProject(${idx}, 'desc', this.innerText)">${proj.desc}</p>
                         </div>
-                        <p class="text-xs text-slate-600 leading-relaxed" contenteditable="${isAdmin}" onblur="updateProject(${idx}, 'desc', this.innerText)">${proj.desc}</p>
-                    </div>
-                    <div class="pt-2 border-t border-emerald-100/80 flex items-center justify-between">
-                        <a href="${proj.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-600">
-                            <span>Truy cập dự án</span>
+                        <a href="${proj.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-600 w-fit">
+                            <span>Xem chi tiết</span>
                             <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                         </a>
-                        <span class="text-[11px] text-emerald-600/70 truncate max-w-[140px]">${(proj.url || '').replace(/^https?:\/\//, '')}</span>
                     </div>
-                </div>
-            `).join("");
+                `).join("");
+            }
 
-            // 6. Render Liên kết liên hệ
+            // 6. Render Liên hệ
             const linksList = document.getElementById("links-list");
-            linksList.innerHTML = (state.links || []).map((lk, idx) => `
-                <div class="inline-flex items-center gap-2 bg-emerald-50/80 hover:bg-emerald-100/80 border border-emerald-200 rounded-2xl px-4 py-2.5 transition shadow-sm">
-                    <a href="${lk.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-950 hover:text-emerald-700">
-                        <i class="${lk.icon || 'fa-solid fa-link'} text-emerald-600"></i>
+            linksList.innerHTML = state.links.map((lk, idx) => `
+                <div class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200 transition">
+                    <a href="${lk.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-950">
+                        <i class="${lk.icon || 'fa-solid fa-link'} text-emerald-600 text-base"></i>
                         <span>${lk.label}</span>
                     </a>
-                    <button onclick="openEditLinkModal(${idx})" class="admin-only text-xs text-emerald-700 hover:text-emerald-900 ml-1" title="Sửa liên kết">
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                    <button onclick="deleteLink(${idx})" class="admin-only text-xs text-rose-500 hover:text-rose-700" title="Xóa liên kết">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <button onclick="editContactLink(${idx})" class="admin-only text-xs text-emerald-700 ml-1"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="removeContactLink(${idx})" class="admin-only text-xs text-rose-500"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             `).join("");
 
-            // 7. Render Góc Ảnh Cá Nhân cuối trang (Từ bộ sưu tập Cloud site_photos)
+            // 7. Render Góc Ảnh Cá Nhân
             const photosGrid = document.getElementById("photos-grid");
-            if (!photosList || photosList.length === 0) {
-                photosGrid.innerHTML = `
-                    <div class="col-span-full py-10 text-center text-slate-400 text-xs">
-                        Chưa có ảnh nào. Hãy mở chế độ Quản trị để tải ảnh của bạn lên Đám mây nhé!
-                    </div>
-                `;
+            if (state.photos.length === 0) {
+                photosGrid.innerHTML = `<p class="text-xs text-slate-400 italic col-span-full">Chưa có ảnh nào được tải lên.</p>`;
             } else {
-                photosGrid.innerHTML = photosList.map((photo) => {
-                    const safeCap = (photo.caption || "").replace(/'/g, "\\'");
-                    return `
-                    <div class="group relative rounded-2xl overflow-hidden bg-emerald-50 border border-emerald-200/80 shadow-sm aspect-square flex flex-col justify-end">
-                        <img src="${photo.url}" alt="${photo.caption || 'Ảnh cá nhân'}" onclick="handlePhotoClick('${photo.id}')" class="absolute inset-0 w-full h-full object-cover cursor-zoom-in group-hover:scale-105 transition duration-500">
-                        <div class="relative z-10 bg-gradient-to-t from-emerald-950/85 via-emerald-950/40 to-transparent p-3 pt-8">
-                            <p class="text-xs text-white font-medium truncate" contenteditable="${isAdmin}" onblur="updatePhotoCaption('${photo.id}', this.innerText)">${photo.caption || 'Ghi chú ảnh...'}</p>
+                photosGrid.innerHTML = state.photos.map((photo, idx) => `
+                    <div class="group relative rounded-2xl overflow-hidden border border-emerald-100 aspect-square bg-emerald-50">
+                        <img src="${photo.url}" alt="${photo.caption || ''}" onclick="openLightbox('${photo.url}')" class="w-full h-full object-cover cursor-zoom-in group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-2.5">
+                            <p class="text-xs text-white font-medium truncate" contenteditable="${isAdmin}" onblur="updatePhotoCaption(${idx}, this.innerText)">${photo.caption || ''}</p>
                         </div>
-                        <button onclick="deletePhoto('${photo.id}')" class="admin-only absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-rose-600 hover:bg-rose-500 text-white items-center justify-center text-xs shadow-md transition" title="Xóa ảnh này khỏi Đám mây">
-                            <i class="fa-solid fa-trash-can"></i>
+                        <button onclick="removePhoto(${idx})" class="admin-only absolute top-2 right-2 w-7 h-7 rounded-full bg-rose-600 text-white items-center justify-center text-xs shadow">
+                            <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
-                    `;
-                }).join("");
+                `).join("");
             }
         }
 
-        // ==========================================
-        // KHỞI TẠO KẾT NỐI FIREBASE & LẮNG NGHE THỜI GIAN THỰC
-        // ==========================================
-        async function initCloudPersistence() {
-            renderAll();
-
-            if (typeof __firebase_config === "undefined" || !__firebase_config) {
-                setCloudBadge("error", "Chế độ xem cục bộ");
-                return;
-            }
-
-            try {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                db = getFirestore(app);
-
-                // RULE 3: Xác thực trước khi thực hiện bất kỳ truy vấn nào
-                if (typeof __initial_auth_token !== "undefined" && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                currentUser = auth.currentUser;
-                onAuthStateChanged(auth, (u) => {
-                    currentUser = u;
-                });
-
-                if (!currentUser) return;
-
-                // 1. Lắng nghe Hồ sơ chính: artifacts/{appId}/public/data/site_config/main_profile
-                const profileRef = doc(db, "artifacts", appId, "public", "data", "site_config", "main_profile");
-                const photosColRef = collection(db, "artifacts", appId, "public", "data", "site_photos");
-
-                onSnapshot(
-                    profileRef,
-                    async (snap) => {
-                        if (snap.exists()) {
-                            const cloudData = snap.data();
-                            state = {
-                                ...state,
-                                ...cloudData
-                            };
-                            renderAll();
-                            setCloudBadge("saved", "✅ Đã lưu đồng bộ Cloud (Mọi trình duyệt đều thấy)");
-                        } else {
-                            // Khởi tạo dữ liệu mặc định lên Cloud lần đầu tiên
-                            await saveAllToCloud(false);
-                            for (const p of window.DEFAULT_DATA.photos) {
-                                const pDoc = doc(db, "artifacts", appId, "public", "data", "site_photos", p.id);
-                                await setDoc(pDoc, {
-                                    url: p.url,
-                                    caption: p.caption,
-                                    createdAt: p.createdAt
-                                });
-                            }
-                        }
-                    },
-                    (err) => {
-                        console.error("Lỗi đồng bộ hồ sơ:", err);
-                        setCloudBadge("error", "Lỗi đồng bộ dữ liệu");
-                    }
-                );
-
-                // 2. Lắng nghe Bộ sưu tập Ảnh cá nhân: artifacts/{appId}/public/data/site_photos
-                onSnapshot(
-                    photosColRef,
-                    (querySnap) => {
-                        const loadedPhotos = [];
-                        querySnap.forEach((docSnap) => {
-                            loadedPhotos.push({
-                                id: docSnap.id,
-                                ...docSnap.data()
-                            });
-                        });
-                        // Sắp xếp ảnh mới nhất lên đầu trong bộ nhớ JS (Tuân thủ RULE 2)
-                        loadedPhotos.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                        photosList = loadedPhotos;
-                        renderAll();
-                    },
-                    (err) => {
-                        console.error("Lỗi đồng bộ thư viện ảnh:", err);
-                    }
-                );
-
-            } catch (e) {
-                console.error("Khởi tạo Cloud thất bại:", e);
-                setCloudBadge("error", "Không thể kết nối Cloud");
+        // --- QUẢN TRỊ & CHỈNH SỬA ---
+        function openAdminModal() {
+            if (isAdmin) { logoutAdmin(); return; }
+            document.getElementById("pin-input").value = "";
+            document.getElementById("pin-modal").classList.remove("hidden");
+            setTimeout(() => document.getElementById("pin-input").focus(), 50);
+        }
+        function closeAdminModal() {
+            document.getElementById("pin-modal").classList.add("hidden");
+        }
+        function verifyPin() {
+            const val = document.getElementById("pin-input").value;
+            if (val === state.pin) {
+                isAdmin = true;
+                closeAdminModal();
+                render();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+                alert("Mật khẩu không đúng!");
             }
         }
-
-        // ==========================================
-        // CÁC HÀM CHỈNH SỬA & TỰ ĐỘNG LƯU LÊN CLOUD
-        // ==========================================
-        window.saveAllToCloud = saveAllToCloud;
-
-        window.updateBasicField = function(key, val) {
-            if (!isAdmin) return;
-            const trimmed = val.trim();
-            if (state[key] === trimmed) return;
-            state[key] = trimmed;
-            saveAllToCloud(true);
-        };
-
-        window.updatePersonalInfo = function(idx, field, val) {
-            if (!isAdmin) return;
-            state.personalInfo[idx][field] = val.trim();
-            saveAllToCloud(true);
-        };
-
-        window.deletePersonalInfo = function(idx) {
-            state.personalInfo.splice(idx, 1);
-            renderAll();
-            saveAllToCloud(true);
-        };
-
-        window.updateTimeline = function(idx, field, val) {
-            if (!isAdmin) return;
-            state.timeline[idx][field] = val.trim();
-            saveAllToCloud(true);
-        };
-
-        window.deleteTimeline = function(idx) {
-            state.timeline.splice(idx, 1);
-            renderAll();
-            saveAllToCloud(true);
-        };
-
-        window.updateSkill = function(idx, val) {
-            if (!isAdmin) return;
-            state.skills[idx] = val.trim();
-            saveAllToCloud(true);
-        };
-
-        window.deleteSkill = function(idx) {
-            state.skills.splice(idx, 1);
-            renderAll();
-            saveAllToCloud(true);
-        };
-
-        window.updateProject = function(idx, field, val) {
-            if (!isAdmin) return;
-            state.projects[idx][field] = val.trim();
-            saveAllToCloud(true);
-        };
-
-        window.deleteProject = function(idx) {
-            state.projects.splice(idx, 1);
-            renderAll();
-            saveAllToCloud(true);
-        };
-
-        window.deleteLink = function(idx) {
-            state.links.splice(idx, 1);
-            renderAll();
-            saveAllToCloud(true);
-        };
-
-        window.updatePhotoCaption = async function(photoId, val) {
-            if (!isAdmin || !currentUser || !db) return;
-            try {
-                setCloudBadge("saving", "☁️ Đang lưu ghi chú ảnh...");
-                const photoRef = doc(db, "artifacts", appId, "public", "data", "site_photos", photoId);
-                await updateDoc(photoRef, { caption: val.trim() });
-                setCloudBadge("saved", "✅ Đã lưu ghi chú ảnh lên Cloud");
-                showToast("Đã lưu ghi chú ảnh lên Đám mây!");
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        window.deletePhoto = async function(photoId) {
-            if (!isAdmin || !currentUser || !db) return;
-            try {
-                setCloudBadge("saving", "☁️ Đang xóa ảnh trên Cloud...");
-                const photoRef = doc(db, "artifacts", appId, "public", "data", "site_photos", photoId);
-                await deleteDoc(photoRef);
-                setCloudBadge("saved", "✅ Đã cập nhật thư viện ảnh trên Cloud");
-                showToast("Đã xóa ảnh khỏi Đám mây!");
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        // ==========================================
-        // HỆ THỐNG HỘP THOẠI TÙY CHỈNH (KHÔNG DÙNG PROMPT/ALERT)
-        // ==========================================
-        function openCustomModal(title, bodyHTML, onConfirm) {
-            document.getElementById("modal-title").innerText = title;
-            document.getElementById("modal-body").innerHTML = bodyHTML;
-            document.getElementById("custom-modal-backdrop").classList.remove("hidden");
-
-            const confirmBtn = document.getElementById("modal-confirm-btn");
-            confirmBtn.onclick = () => onConfirm();
-
-            const firstInput = document.querySelector("#modal-body input");
-            if (firstInput) {
-                setTimeout(() => firstInput.focus(), 50);
-                firstInput.onkeydown = (e) => {
-                    if (e.key === "Enter") onConfirm();
-                };
-            }
-        }
-
-        window.closeCustomModal = function() {
-            document.getElementById("custom-modal-backdrop").classList.add("hidden");
-        };
-
-        window.handleAdminTrigger = function() {
-            if (isAdmin) {
-                window.lockAdminMode();
-                return;
-            }
-            openCustomModal(
-                "🔒 Mở khóa Chế độ Quản trị",
-                `
-                <p class="text-xs text-slate-500">Nhập mật khẩu của chủ sở hữu để chỉnh sửa trực tiếp nội dung và tải ảnh lên Đám mây (Mặc định: <strong>1234</strong>).</p>
-                <input type="password" id="pin-input" placeholder="Nhập mật khẩu..." class="w-full px-3.5 py-2.5 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
-                <p id="pin-error" class="hidden text-xs text-rose-600 font-semibold">Mật khẩu không đúng, vui lòng thử lại!</p>
-                `,
-                () => {
-                    const val = document.getElementById("pin-input").value;
-                    if (val === (state.pin || "1234")) {
-                        isAdmin = true;
-                        window.closeCustomModal();
-                        renderAll();
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                        showToast("Đã mở Chế độ Quản trị! Mọi chỉnh sửa sẽ tự động lưu lên Đám mây.");
-                    } else {
-                        document.getElementById("pin-error").classList.remove("hidden");
-                    }
-                }
-            );
-        };
-
-        window.lockAdminMode = function() {
+        function logoutAdmin() {
             isAdmin = false;
-            saveAllToCloud(false);
-            renderAll();
-            showToast("Đã khóa lại! Người xem chỉ có thể đọc và bấm vào link.");
-        };
+            saveState();
+            render();
+        }
+        function changePin() {
+            const newPin = prompt("Nhập mật khẩu Quản trị mới:", state.pin);
+            if (newPin && newPin.trim()) {
+                state.pin = newPin.trim();
+                saveState();
+                alert("Đã đổi mật khẩu! Hãy bấm 'Copy Code HTML đã sửa' hoặc 'Lưu thẳng lên GitHub' để áp dụng cho mọi thiết bị.");
+            }
+        }
 
-        window.openPasswordModal = function() {
-            openCustomModal(
-                "🔑 Đổi mật khẩu Quản trị",
-                `
-                <label class="block text-xs font-bold text-slate-600 mb-1">Mật khẩu mới (Được đồng bộ trên mọi trình duyệt)</label>
-                <input type="text" id="new-pin-input" value="${state.pin || '1234'}" class="w-full px-3.5 py-2.5 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
-                `,
-                () => {
-                    const newPin = document.getElementById("new-pin-input").value.trim();
-                    if (newPin) {
-                        state.pin = newPin;
-                        window.closeCustomModal();
-                        saveAllToCloud(true);
-                    }
-                }
-            );
-        };
+        function saveField(key, val) {
+            if (!isAdmin) return;
+            state[key] = val.trim();
+            saveState();
+        }
 
-        window.openPersonalInfoModal = function() {
-            openCustomModal(
-                "➕ Thêm mục Thông tin cá nhân",
-                `
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Tên mục (VD: Ngày sinh, Quê quán, Số điện thoại...)</label>
-                    <input type="text" id="info-label-input" placeholder="VD: Số điện thoại" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Nội dung hiển thị</label>
-                    <input type="text" id="info-value-input" placeholder="VD: 09xx xxx xxx" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                `,
-                () => {
-                    const label = document.getElementById("info-label-input").value.trim();
-                    const value = document.getElementById("info-value-input").value.trim();
-                    if (label && value) {
-                        state.personalInfo.push({ icon: "fa-solid fa-leaf", label, value });
-                        renderAll();
-                        window.closeCustomModal();
-                        saveAllToCloud(true);
-                    }
-                }
-            );
-        };
+        function updateAvatar(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            compressImage(file, 400, (dataUrl) => {
+                state.avatar = dataUrl;
+                saveState();
+                render();
+            });
+        }
 
-        window.openTimelineModal = function() {
-            openCustomModal(
-                "➕ Thêm cột mốc Học vấn / Kinh nghiệm",
-                `
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Thời gian</label>
-                    <input type="text" id="tl-time-input" placeholder="VD: 2025 - Hiện tại" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Tiêu đề trường học / công việc</label>
-                    <input type="text" id="tl-title-input" placeholder="VD: Đại học Hùng Vương" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Mô tả chi tiết</label>
-                    <input type="text" id="tl-desc-input" placeholder="Mô tả ngắn gọn..." class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                `,
-                () => {
-                    const time = document.getElementById("tl-time-input").value.trim() || "2026";
-                    const title = document.getElementById("tl-title-input").value.trim();
-                    const desc = document.getElementById("tl-desc-input").value.trim();
-                    if (title) {
-                        state.timeline.unshift({ time, title, desc });
-                        renderAll();
-                        window.closeCustomModal();
-                        saveAllToCloud(true);
-                    }
-                }
-            );
-        };
+        function updatePersonalInfo(idx, field, val) {
+            state.personalInfo[idx][field] = val.trim();
+            saveState();
+        }
+        function addPersonalInfo() {
+            const label = prompt("Tên mục (VD: EMAIL, SỞ THÍCH):");
+            if (!label) return;
+            const value = prompt("Nội dung:");
+            state.personalInfo.push({ icon: "fa-solid fa-star", label: label.trim().toUpperCase(), value: (value || "").trim() });
+            saveState(); render();
+        }
+        function removePersonalInfo(idx) {
+            state.personalInfo.splice(idx, 1);
+            saveState(); render();
+        }
 
-        window.openSkillModal = function() {
-            openCustomModal(
-                "➕ Thêm Kỹ năng mới",
-                `
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Tên kỹ năng</label>
-                    <input type="text" id="skill-name-input" placeholder="VD: Lập trình nhúng IoT" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                `,
-                () => {
-                    const val = document.getElementById("skill-name-input").value.trim();
-                    if (val) {
-                        state.skills.push(val);
-                        renderAll();
-                        window.closeCustomModal();
-                        saveAllToCloud(true);
-                    }
-                }
-            );
-        };
+        function updateTimeline(idx, field, val) {
+            state.timeline[idx][field] = val.trim();
+            saveState();
+        }
+        function addTimeline() {
+            state.timeline.unshift({ time: "Thời gian", title: "Tiêu đề cột mốc mới", desc: "Mô tả chi tiết..." });
+            saveState(); render();
+        }
+        function removeTimeline(idx) {
+            state.timeline.splice(idx, 1);
+            saveState(); render();
+        }
 
-        window.openProjectModal = function() {
-            openCustomModal(
-                "➕ Thêm Dự án mới",
-                `
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Tên dự án</label>
-                    <input type="text" id="proj-title-input" placeholder="VD: Hệ thống tự động hóa Python" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Mô tả ngắn</label>
-                    <input type="text" id="proj-desc-input" placeholder="Mô tả ngắn gọn về dự án..." class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Đường dẫn (Link khi người xem bấm vào)</label>
-                    <input type="url" id="proj-url-input" value="https://" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                `,
-                () => {
-                    const title = document.getElementById("proj-title-input").value.trim();
-                    const desc = document.getElementById("proj-desc-input").value.trim() || "Dự án cá nhân.";
-                    const url = document.getElementById("proj-url-input").value.trim() || "#";
-                    if (title) {
-                        state.projects.unshift({ title, desc, url });
-                        renderAll();
-                        window.closeCustomModal();
-                        saveAllToCloud(true);
-                    }
-                }
-            );
-        };
+        function updateSkill(idx, val) {
+            state.skills[idx] = val.trim();
+            saveState();
+        }
+        function addSkill() {
+            const s = prompt("Nhập kỹ năng mới:");
+            if (s) { state.skills.push(s.trim()); saveState(); render(); }
+        }
+        function removeSkill(idx) {
+            state.skills.splice(idx, 1);
+            saveState(); render();
+        }
 
-        window.openEditProjectUrlModal = function(idx) {
-            openCustomModal(
-                "🔗 Sửa đường dẫn (Link) dự án",
-                `
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Đường link của dự án "${state.projects[idx].title}"</label>
-                    <input type="url" id="edit-proj-url" value="${state.projects[idx].url}" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                `,
-                () => {
-                    const url = document.getElementById("edit-proj-url").value.trim();
-                    if (url) {
-                        state.projects[idx].url = url;
-                        renderAll();
-                        window.closeCustomModal();
-                        saveAllToCloud(true);
-                    }
-                }
-            );
-        };
+        function updateProject(idx, field, val) {
+            state.projects[idx][field] = val.trim();
+            saveState();
+        }
+        function editProjectUrl(idx) {
+            const url = prompt("Đường dẫn (URL) của dự án:", state.projects[idx].url);
+            if (url) { state.projects[idx].url = url.trim(); saveState(); render(); }
+        }
+        function addProject() {
+            const title = prompt("Tên dự án:");
+            if (!title) return;
+            const url = prompt("Đường dẫn dự án (URL):", "https://");
+            state.projects.push({ title: title.trim(), desc: "Mô tả ngắn gọn về dự án...", url: (url || "#").trim() });
+            saveState(); render();
+        }
+        function removeProject(idx) {
+            state.projects.splice(idx, 1);
+            saveState(); render();
+        }
 
-        window.openLinkModal = function() {
-            openCustomModal(
-                "➕ Thêm Liên kết mạng xã hội / Liên hệ",
-                `
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Tên nút hiển thị (VD: Zalo, TikTok, LinkedIn...)</label>
-                    <input type="text" id="link-label-input" placeholder="VD: Zalo cá nhân" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Đường dẫn (URL)</label>
-                    <input type="url" id="link-url-input" value="https://" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                `,
-                () => {
-                    const label = document.getElementById("link-label-input").value.trim();
-                    const url = document.getElementById("link-url-input").value.trim() || "#";
-                    if (label) {
-                        state.links.push({ label, url, icon: "fa-solid fa-link" });
-                        renderAll();
-                        window.closeCustomModal();
-                        saveAllToCloud(true);
-                    }
-                }
-            );
-        };
+        function addContactLink() {
+            const label = prompt("Tên nút liên hệ (VD: Zalo, TikTok, Email):");
+            if (!label) return;
+            const url = prompt("Đường dẫn (URL):", "https://");
+            state.links.push({ label: label.trim(), url: (url || "#").trim(), icon: "fa-solid fa-link" });
+            saveState(); render();
+        }
+        function editContactLink(idx) {
+            const label = prompt("Tên hiển thị:", state.links[idx].label);
+            if (!label) return;
+            const url = prompt("Đường dẫn (URL):", state.links[idx].url);
+            state.links[idx].label = label.trim();
+            if (url) state.links[idx].url = url.trim();
+            saveState(); render();
+        }
+        function removeContactLink(idx) {
+            state.links.splice(idx, 1);
+            saveState(); render();
+        }
 
-        window.openEditLinkModal = function(idx) {
-            openCustomModal(
-                "✏️ Chỉnh sửa Liên kết",
-                `
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Tên hiển thị</label>
-                    <input type="text" id="edit-link-label" value="${state.links[idx].label}" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Đường dẫn (URL)</label>
-                    <input type="url" id="edit-link-url" value="${state.links[idx].url}" class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                `,
-                () => {
-                    const label = document.getElementById("edit-link-label").value.trim();
-                    const url = document.getElementById("edit-link-url").value.trim();
-                    if (label && url) {
-                        state.links[idx].label = label;
-                        state.links[idx].url = url;
-                        renderAll();
-                        window.closeCustomModal();
-                        saveAllToCloud(true);
-                    }
-                }
-            );
-        };
+        function uploadPhotos(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                compressImage(file, 850, (dataUrl) => {
+                    state.photos.unshift({ url: dataUrl, caption: "Khoảnh khắc đáng nhớ" });
+                    saveState();
+                    render();
+                });
+            });
+            e.target.value = "";
+        }
+        function updatePhotoCaption(idx, val) {
+            state.photos[idx].caption = val.trim();
+            saveState();
+        }
+        function removePhoto(idx) {
+            state.photos.splice(idx, 1);
+            saveState(); render();
+        }
 
-        // ==========================================
-        // NÉN ẢNH & TẢI TRỰC TIẾP LÊN ĐÁM MÂY (CLOUD)
-        // ==========================================
-        function compressImage(file, maxWidth, quality, callback) {
+        function openLightbox(url) {
+            if (isAdmin) return;
+            document.getElementById("lightbox-img").src = url;
+            document.getElementById("lightbox").classList.remove("hidden");
+        }
+
+        function compressImage(file, maxW, callback) {
             const reader = new FileReader();
-            reader.onload = function(ev) {
+            reader.onload = (ev) => {
                 const img = new Image();
-                img.onload = function() {
+                img.onload = () => {
                     const canvas = document.createElement("canvas");
                     let w = img.width, h = img.height;
-                    if (w > maxWidth) {
-                        h = Math.round((h * maxWidth) / w);
-                        w = maxWidth;
-                    }
-                    canvas.width = w;
-                    canvas.height = h;
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(img, 0, 0, w, h);
-                    callback(canvas.toDataURL("image/jpeg", quality));
+                    if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+                    callback(canvas.toDataURL("image/jpeg", 0.8));
                 };
                 img.src = ev.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        window.handleAvatarUpload = function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            compressImage(file, 400, 0.78, async (dataUrl) => {
-                state.avatar = dataUrl;
-                renderAll();
-                await saveAllToCloud(true);
-            });
-        };
+        // Tạo mã nguồn HTML hoàn chỉnh chứa dữ liệu mới nhất
+        function buildUpdatedHTMLString() {
+            const prevAdmin = isAdmin;
+            isAdmin = false;
+            render();
+            const newVersion = "v_" + Date.now();
+            const scriptContent = `\n        window.DATA_VERSION = "${newVersion}";\n        window.DEFAULT_DATA = ${JSON.stringify(state, null, 4)};\n    `;
+            const clone = document.documentElement.cloneNode(true);
+            clone.querySelector("#initial-data").innerHTML = scriptContent;
+            const fullHtml = "<!DOCTYPE html>\n" + clone.outerHTML;
+            isAdmin = prevAdmin;
+            render();
+            return fullHtml;
+        }
 
-        window.handleGalleryUpload = function(e) {
-            const files = Array.from(e.target.files);
-            if (!files.length || !currentUser || !db) return;
+        // 1. Copy toàn bộ code HTML đã nhúng sẵn dữ liệu mới vào bộ nhớ tạm
+        async function copyUpdatedHTML() {
+            const fullHtml = buildUpdatedHTMLString();
+            try {
+                await navigator.clipboard.writeText(fullHtml);
+                alert("✅ Đã sao chép toàn bộ mã nguồn HTML mới (kèm dữ liệu và ảnh vừa sửa)!\n\nBạn chỉ cần mở file index.html trên GitHub và Dán (Paste) đè vào là mọi trình duyệt, điện thoại và máy tính khác đều cập nhật ngay.");
+            } catch (err) {
+                const blob = new Blob([fullHtml], { type: "text/html;charset=utf-8" });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "index.html";
+                a.click();
+            }
+        }
 
-            setCloudBadge("saving", `☁️ Đang tải ${files.length} ảnh lên Đám mây...`);
-            const photosColRef = collection(db, "artifacts", appId, "public", "data", "site_photos");
+        // 2. Lưu trực tiếp lên GitHub Repository qua GitHub API (không cần mở GitHub)
+        async function saveToGitHub() {
+            const savedRepo = localStorage.getItem("gh_repo") || "";
+            const savedToken = localStorage.getItem("gh_token") || "";
 
-            files.forEach((file, index) => {
-                compressImage(file, 800, 0.75, async (dataUrl) => {
-                    try {
-                        const defaultCap = file.name.replace(/\.[^/.]+$/, "") || "Khoảnh khắc đáng nhớ";
-                        await addDoc(photosColRef, {
-                            url: dataUrl,
-                            caption: defaultCap,
-                            createdAt: Date.now() + index
-                        });
-                        setCloudBadge("saved", "✅ Đã lưu ảnh mới lên Cloud (Mọi trình duyệt đều thấy)");
-                        showToast("Đã tải ảnh lên Đám mây thành công!");
-                    } catch (err) {
-                        console.error("Lỗi khi tải ảnh lên Cloud:", err);
-                        showToast("Không thể tải ảnh lên Cloud, vui lòng thử lại!");
-                    }
+            const repo = prompt("Nhập tên Repository GitHub của bạn (VD: khai/khai.github.io):", savedRepo);
+            if (!repo) return;
+            const token = prompt("Nhập GitHub Personal Access Token (quyền repo/contents):", savedToken);
+            if (!token) return;
+
+            localStorage.setItem("gh_repo", repo.trim());
+            localStorage.setItem("gh_token", token.trim());
+
+            try {
+                const apiUrl = `https://api.github.com/repos/${repo.trim()}/contents/index.html`;
+                const getRes = await fetch(apiUrl, {
+                    headers: { "Authorization": `Bearer ${token.trim()}`, "Accept": "application/vnd.github+json" }
                 });
-            });
-            e.target.value = "";
-        };
+                if (!getRes.ok) throw new Error("Không tìm thấy file index.html hoặc Token chưa đúng quyền.");
+                const fileData = await getRes.json();
 
-        window.handlePhotoClick = function(photoId) {
-            if (isAdmin) return;
-            const found = photosList.find(p => p.id === photoId);
-            if (!found) return;
-            document.getElementById("lightbox-img").src = found.url;
-            document.getElementById("lightbox-caption").innerText = found.caption || "";
-            document.getElementById("lightbox-modal").classList.remove("hidden");
-        };
+                const fullHtml = buildUpdatedHTMLString();
+                const base64Content = btoa(unescape(encodeURIComponent(fullHtml)));
 
-        window.closeLightbox = function() {
-            document.getElementById("lightbox-modal").classList.add("hidden");
-        };
+                const putRes = await fetch(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token.trim()}`,
+                        "Accept": "application/vnd.github+json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: "Cập nhật hồ sơ cá nhân từ trang web",
+                        content: base64Content,
+                        sha: fileData.sha
+                    })
+                });
 
-        // Khởi chạy hệ thống đồng bộ Đám mây khi mở trang
-        initCloudPersistence();
+                if (putRes.ok) {
+                    alert("🎉 Đã lưu trực tiếp lên GitHub thành công! Sau khoảng 30 giây, mọi thiết bị truy cập duckhai.id.vn đều sẽ thấy nội dung mới.");
+                } else {
+                    throw new Error("Không thể ghi file lên GitHub.");
+                }
+            } catch (e) {
+                alert("Lỗi: " + e.message + "\n\nBạn có thể dùng nút 'Copy Code HTML đã sửa' bên cạnh để dán thủ công lên GitHub nhé!");
+            }
+        }
+
+        render();
     </script>
 </body>
 </html>
