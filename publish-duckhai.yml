@@ -1,0 +1,69 @@
+name: Publish duckhai.id.vn and HVU Bank
+
+on:
+  # Rebuild when the personal-site repository changes.
+  push:
+    branches: [main]
+  # Allow manual refresh after updating HVU Bank.
+  workflow_dispatch:
+  # Periodically pick up changes from the separate, public HVU Bank repository.
+  # GitHub schedules are best-effort and can be delayed or disabled after inactivity.
+  schedule:
+    - cron: '17,47 * * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: duckhai-github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout personal site (PRO5)
+        uses: actions/checkout@v4
+        with:
+          path: site
+          persist-credentials: false
+
+      - name: Checkout separate HVU Bank repository
+        uses: actions/checkout@v4
+        with:
+          repository: khaivjp/hvu-blue-bank
+          ref: main
+          path: bank
+          persist-credentials: false
+
+      - name: Assemble one Pages site without changing either repository
+        run: |
+          mkdir -p site/hvubank
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='CNAME' \
+            --exclude='README*' \
+            bank/ site/hvubank/
+          touch site/.nojekyll
+          test -f site/index.html
+          test -f site/hvubank/index.html
+          test -f site/hvubank/app.js
+          echo 'Site ready: / and /hvubank/'
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
