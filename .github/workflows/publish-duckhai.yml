@@ -40,7 +40,13 @@ jobs:
           ref: main
           path: bank
           persist-credentials: false
-
+       - name: Checkout Life
+        uses: actions/checkout@v4
+        with:
+          repository: khaivjp/life
+          ref: main
+          path: life-source
+          persist-credentials: false
       - name: Assemble one Pages site without changing either repository
         run: |
           mkdir -p site/hvubank
@@ -50,6 +56,18 @@ jobs:
             --exclude='CNAME' \
             --exclude='README*' \
             bank/ site/hvubank/
+                      mkdir -p site/life
+          LIFE_DIR=life-source
+          if [ -f life-source/dist/index.html ]; then
+            LIFE_DIR=life-source/dist
+          fi
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='CNAME' \
+            --exclude='README*' \
+            "$LIFE_DIR/" site/life/
+          test -f site/life/index.html
           touch site/.nojekyll
           test -f site/index.html
           test -f site/hvubank/index.html
