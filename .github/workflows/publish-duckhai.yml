@@ -1,13 +1,9 @@
-name: Publish duckhai.id.vn and HVU Bank
+name: Publish duckhai.id.vn, HVU Bank and Life
 
 on:
-  # Rebuild when the personal-site repository changes.
   push:
     branches: [main]
-  # Allow manual refresh after updating HVU Bank.
   workflow_dispatch:
-  # Periodically pick up changes from the separate, public HVU Bank repository.
-  # GitHub schedules are best-effort and can be delayed or disabled after inactivity.
   schedule:
     - cron: '17,47 * * * *'
 
@@ -26,53 +22,62 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Checkout personal site (PRO5)
+      - name: Checkout PRO5
         uses: actions/checkout@v4
         with:
           path: site
           persist-credentials: false
 
-      - name: Checkout separate HVU Bank repository
+      - name: Checkout HVU Bank
         uses: actions/checkout@v4
         with:
           repository: khaivjp/hvu-blue-bank
           ref: main
           path: bank
           persist-credentials: false
-       - name: Checkout Life
+
+      - name: Checkout Life
         uses: actions/checkout@v4
         with:
           repository: khaivjp/life
           ref: main
           path: life-source
           persist-credentials: false
-      - name: Assemble one Pages site without changing either repository
+
+      - name: Assemble website
+        shell: bash
         run: |
-          mkdir -p site/hvubank
+          set -euo pipefail
+
+          mkdir -p site/hvubank site/life
+
           rsync -a --delete \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='CNAME' \
             --exclude='README*' \
             bank/ site/hvubank/
-                      mkdir -p site/life
+
           LIFE_DIR=life-source
           if [ -f life-source/dist/index.html ]; then
             LIFE_DIR=life-source/dist
           fi
+
           rsync -a --delete \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='CNAME' \
             --exclude='README*' \
             "$LIFE_DIR/" site/life/
-          test -f site/life/index.html
+
           touch site/.nojekyll
+
           test -f site/index.html
           test -f site/hvubank/index.html
           test -f site/hvubank/app.js
-          echo 'Site ready: / and /hvubank/'
+          test -f site/life/index.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
